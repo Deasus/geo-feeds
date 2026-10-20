@@ -220,6 +220,18 @@ def fetch_adsbx_all(session: requests.Session) -> list[dict] | None:
 
 
 
+# 2026-05-29: per-endpoint cool-down. If an upstream times out or 5xxs once
+# in a run, skip it for the remaining regions instead of burning 8s × N more.
+# Reset between runs (module-scope state, fresh per cron invocation).
+_dead_endpoints: set[str] = set()
+# 2026-10-05 — adsb.lol answered 429 after 3 back-to-back region calls, and the other 21
+# regions fell to adsb.fi's smaller 250 nm radius (Alaska 33 aircraft). Pace each endpoint,
+# and on a 429 honour Retry-After once before giving the endpoint up for the run.
+_MIN_GAP_SEC = 1.2
+_last_call: dict[str, float] = {}
+_RATE_COOLDOWN_SEC = 30          # a rate-limited endpoint comes back after this, not never
+_cooling_until: dict[str, float] = {}
+
 def fetch_region(name: str, lat: float, lng: float, radius: int, session: requests.Session) -> list[dict]:
     """Fetch a single region from adsb.lol, falling back to adsb.fi."""
     for base, label in [(PRIMARY, 'primary'), (FAILOVER, 'failover')]:
