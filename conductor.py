@@ -40,6 +40,8 @@ ONLY = [f for f in os.environ.get('CONDUCTOR_ONLY', '').replace(' ', '').split('
 PUSH = os.environ.get('CONDUCTOR_PUSH', '1') == '1'
 FAST_EVERY = 300                      # feeds this frequent run in the fast lane
 STATUS_EVERY = 300
+# Never published from any feed: download/staging scratch that some fetchers keep under data/.
+DEFAULT_IGNORE = ['*.grib2', '*.grib', '*.idx', '*.tmp', '_tmp*', '*.part', '*.923a8.idx', '__pycache__/']
 BOT = {'GIT_AUTHOR_NAME': 'geo-feeds', 'GIT_AUTHOR_EMAIL': '41898282+github-actions[bot]@users.noreply.github.com',
        'GIT_COMMITTER_NAME': 'geo-feeds', 'GIT_COMMITTER_EMAIL': '41898282+github-actions[bot]@users.noreply.github.com'}
 
@@ -94,9 +96,8 @@ def publish(branch: str, src: str, ignore=(), force=False) -> bool:
     """Publish src/ as one parentless commit on branch if its tree changed."""
     if not os.path.isdir(src) or not os.listdir(src):
         return False
-    if ignore:
-        with open(os.path.join(src, '.gitignore'), 'w') as f:
-            f.write('\n'.join(ignore) + '\n')
+    with open(os.path.join(src, '.gitignore'), 'w') as f:
+        f.write('\n'.join(DEFAULT_IGNORE + list(ignore)) + '\n')
 
     def build(env):
         git(f'--work-tree={src}', 'add', '-A', '.', env=env)
