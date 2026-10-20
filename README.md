@@ -19,7 +19,7 @@ https://raw.githubusercontent.com/Deasus/geo-feeds/status/status.json   # health
 | `goes-fire` | GOES ABI fire detections | NOAA open data | 2 min |
 | `ngfs` | Next Generation Fire System detections | UW–Madison SSEC/CIMSS | 2 min |
 | `himawari` | Himawari-9 fire hotspots over Australia, deconflicted | Geoscience Australia, DEA Hotspots (CC BY 4.0) | 10 min |
-| `meteosat` | Meteosat-12 fire detections: Europe, Africa, Middle East; per-region files; deconflicted | EUMETSAT LSA SAF (CC BY 4.0) | 10 min |
+| `meteosat` | Meteosat-12 fire detections, Europe, Africa, Middle East (`meteosat_fire.json`, `meteosat/<region>.json`); Meteosat-9 Indian Ocean (IODC, 45.5°E) fire detections east of 60°E, India, Central Asia, western SE Asia (`iodc_fire.json`, `iodc/<region>.json`); deconflicted | EUMETSAT LSA SAF (CC BY 4.0) | 10 min (IODC data arrives hourly) |
 | `lightning` | GLM lightning | NOAA open data | 1 min |
 | `wind`, `ecmwf`, `hrrr` | GFS, ECMWF and HRRR wind (+ HRRR temperature/RH) | NOAA, ECMWF open data | 1–3 h |
 | `aqi`, `cams` | Air quality; speciated aerosol | Open-Meteo; Copernicus ADS | 30 min; 6 h |

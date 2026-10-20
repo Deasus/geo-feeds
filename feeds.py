@@ -29,8 +29,10 @@ FEEDS = {
     # ── geostationary fire outside the Americas ─────────────────────────
     'himawari':  {'code': ['himawari', '_shared', 'firms'], 'run': [['python', 'fetch_himawari.py']],
                   'every': 600, 'timeout': 300},
-    'meteosat':  {'code': ['meteosat', '_shared', 'firms'], 'run': [['python', 'fetch_meteosat.py']],
-                  'every': 600, 'timeout': 600, 'requires': ['LSASAF_USER', 'LSASAF_PASSWORD']},
+    'meteosat':  {'code': ['meteosat', '_shared', 'firms'],
+                  'run': [['python', 'fetch_meteosat.py'], ['python', 'fetch_iodc.py']],
+                  'every': 600, 'timeout': 600, 'keep_going': True,
+                  'requires': ['LSASAF_USER', 'LSASAF_PASSWORD']},
 
     # ── polar-orbiter fire + its 90-day persistence archive ─────────────
     'firms':     {'code': ['firms'], 'run': [['python', 'fetch_firms.py'], ['python', 'archive_day.py']],

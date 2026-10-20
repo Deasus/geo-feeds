@@ -5,6 +5,7 @@ scikit-learn
 boto3
 botocore
 netCDF4
+h5py
 xarray
 cfgrib
 eccodes
