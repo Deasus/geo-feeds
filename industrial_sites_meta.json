@@ -1,0 +1,65 @@
+{
+  "generated_utc": "2026-10-20T16:31:35.762581Z",
+  "total_features": 28010,
+  "sources": [
+    {
+      "source": "epa_frs",
+      "generated": "2026-10-20T16:30:16.246949Z",
+      "count": 9771,
+      "naics_used": [
+        "324110",
+        "221112",
+        "331110",
+        "327310",
+        "562213"
+      ]
+    },
+    {
+      "source": "gvp_holocene",
+      "generated": "2026-10-20T16:30:18.391658Z",
+      "count": 1214
+    },
+    {
+      "source": "gibs_nuclear",
+      "generated": "2026-10-20T16:30:18.798329Z",
+      "count": 235
+    },
+    {
+      "source": "firms_self_mined_persistent",
+      "generated": "2026-10-20T16:22:05.135037Z",
+      "count": 2776,
+      "lookback_days": 90,
+      "sampled_commits": 91,
+      "algorithm": "0.0040\u00b0 grid quantization + \u22656 distinct-day threshold"
+    },
+    {
+      "source": "global_industrial",
+      "generated": "2026-10-20T16:30:19.309111Z",
+      "count": 14014,
+      "detail": {
+        "wri_gppd": {
+          "status": "fresh",
+          "count": 7480,
+          "generated_utc": "2026-10-20T16:30:19.309111Z"
+        },
+        "osm": {
+          "status": "fresh",
+          "count": 6534,
+          "generated_utc": "2026-10-20T16:30:19.309111Z"
+        }
+      }
+    },
+    {
+      "source": "natural_earth_land_10m",
+      "file": "data/land_10m.geojson",
+      "available": true
+    }
+  ],
+  "consumer": "firms feed/fetch_firms.py",
+  "buffer_defaults": {
+    "industrial": 500,
+    "volcano": 5000,
+    "nuclear": 500,
+    "persistent_other": 500
+  }
+}
