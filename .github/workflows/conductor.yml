@@ -1,0 +1,57 @@
+name: conductor
+
+# One long-lived job runs every feed on its own cadence (see conductor.py), then
+# exits after ~5h20m. Each run queues its successor FIRST, so a failed or cancelled
+# run cannot break the chain; the concurrency group holds the successor until this
+# run ends. The cron is only a dead-man restart.
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Comma-separated feeds to run once, without starting the chain (debugging)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: conductor
+  cancel-in-progress: false
+
+jobs:
+  conduct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: queue the next run (first, so this run cannot break the chain)
+        if: ${{ github.event_name == 'schedule' || inputs.only == '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run conductor.yml --ref main || echo "::warning::re-dispatch failed; the schedule will restart the chain"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: install dependencies
+        run: python -m pip install --quiet -r requirements.txt
+
+      - name: run feeds
+        env:
+          CONDUCTOR_ONLY: ${{ inputs.only }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          ADSBX_API_KEY: ${{ secrets.ADSBX_API_KEY }}
+          CDS_API_TOKEN: ${{ secrets.CDS_API_TOKEN }}
+          LSASAF_USER: ${{ secrets.LSASAF_USER }}
+          LSASAF_PASSWORD: ${{ secrets.LSASAF_PASSWORD }}
+        run: python conductor.py

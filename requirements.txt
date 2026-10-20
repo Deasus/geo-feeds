@@ -1,0 +1,15 @@
+requests
+numpy
+scipy
+scikit-learn
+boto3
+botocore
+netCDF4
+xarray
+cfgrib
+eccodes
+ecmwf-opendata
+cdsapi
+pdfplumber
+pyshp>=2.3.1
+mapbox-vector-tile>=2.0.1
