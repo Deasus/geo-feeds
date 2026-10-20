@@ -17,9 +17,8 @@ Coordination Center, ~06:30 MT. It contains:
 
 Why this matters for geo-feeds: WFIGS gives us live IRWIN incident geometry,
 but the IMSR is the authoritative human-curated daily summary that ICs and
-fire-management leadership read. It's the document Scott (USFWS) and his
-peers reach for first thing in the morning. Surfacing it directly so the
-geo-feeds AI can answer "what's the national prep level today" / "who's got
+fire-management leadership read first thing in the morning. Surfacing it
+directly lets consumers answer "what's the national prep level today" / "who's got
 a CIMT committed" / "what does Predictive Services say about today's
 weather" closes a real situational gap.
 
@@ -152,8 +151,7 @@ def parse_resource_summary(p1_text: str) -> list:
 
     `pl` is the per-GACC Preparedness Level (1-5), or None when the column is
     absent (pre-July-2026 layout) or not applicable (the Total row, which
-    prints "---"). This is the label the GACC-level PL index trains on — see
-    ~/Projects/research feed/PREPAREDNESS_LEVEL_2026-08-27.md.
+    prints "---").
 
     NOTE: the Total row IS included in this list (it always has been, despite
     an earlier comment claiming otherwise). Consumers filter by `gacc`, so
