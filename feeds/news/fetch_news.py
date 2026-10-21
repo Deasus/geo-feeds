@@ -1281,6 +1281,52 @@ def categorize_article(title):
 
 # ── MAIN ────────────────────────────────────────────────────────────
 
+
+# ── Unrest headlines (GDELT DOC 2.0) ─────────────────────────────────
+
+UNREST_QUERY = ('(protest OR protesters OR riot OR rioting OR "civil unrest" OR curfew OR "tear gas" OR "martial law") '
+                'sourcelang:english')
+
+
+def fetch_unrest_headlines():
+    """One GDELT query for civil-unrest headlines in the last 24 h, written to data/unrest.json.
+    Headlines only: GDELT gives the outlet's country, not the event's location. Additive: nothing
+    else reads or depends on this file. A failed fetch keeps the previous file."""
+    import requests
+
+    print("\n[GDELT DOC] Fetching unrest headlines...")
+    url = (f'https://api.gdeltproject.org/api/v2/doc/doc?query={quote(UNREST_QUERY)}'
+           f'&mode=artlist&maxrecords=75&format=json&timespan=24h&sort=hybridrel')
+    articles = None
+    for attempt in range(2):
+        try:
+            resp = requests.get(url, timeout=30)
+            if resp.status_code == 200:
+                articles = resp.json().get('articles', [])
+                break
+            print(f"  unrest: HTTP {resp.status_code}" + (" — waiting 15s" if attempt == 0 else ""))
+        except Exception as e:
+            print(f"  unrest failed: {e}")
+        time.sleep(15)
+    if articles is None:
+        print("  unrest: keeping the previous file")
+        return
+    seen, rows = set(), []
+    for a in articles:
+        title, link = (a.get('title') or '').strip(), a.get('url') or ''
+        key = title.lower()
+        if not title or not link or key in seen:
+            continue
+        seen.add(key)
+        rows.append({'title': title, 'domain': a.get('domain'), 'sourcecountry': a.get('sourcecountry'),
+                     'seendate': a.get('seendate'), 'language': a.get('language'), 'url': link})
+    out = {'generated_utc': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'),
+           'source': 'GDELT DOC 2.0 (news-derived; outlet country, not event location)',
+           'count': len(rows), 'articles': rows}
+    with open(os.path.join(DATA_DIR, 'unrest.json'), 'w') as f:
+        json.dump(out, f, separators=(',', ':'))
+    print(f"  unrest: {len(rows)} headlines")
+
 def main():
     print("=" * 60)
     print("geo-feeds News Intelligence Pipeline v2")
@@ -1455,6 +1501,13 @@ def main():
     }
     with open(os.path.join(DATA_DIR, 'meta.json'), 'w') as f:
         json.dump(meta, f, indent=2)
+
+    # Unrest headlines for the hazards board (separate file; GDELT asks for spaced requests).
+    time.sleep(7)
+    try:
+        fetch_unrest_headlines()
+    except Exception as e:
+        print(f"[unrest] skipped: {e}")
 
     print(f"\n{'='*60}")
     print(f"Output: {feed_path} ({size_kb:.0f} KB)")
