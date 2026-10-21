@@ -1,0 +1,8 @@
+*.grib2
+*.grib
+*.idx
+*.tmp
+_tmp*
+*.part
+*.923a8.idx
+__pycache__/
