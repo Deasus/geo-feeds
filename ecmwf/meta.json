@@ -1,0 +1,77 @@
+{
+ "generated_utc": "2026-10-24T13:36:40.024419Z",
+ "ref_time": "2026-10-24T06:00:00Z",
+ "step_hours": 0,
+ "model": "ECMWF IFS HRES open data",
+ "resolution_deg": 0.25,
+ "mirror": "ecmwf",
+ "attribution": "(c) ECMWF, CC BY 4.0",
+ "regions": {
+  "canada": {
+   "bbox": [
+    41.0,
+    72.0,
+    -141.0,
+    -52.0
+   ],
+   "file": "current-wind-10m-ecmwf-canada.json",
+   "nx": 357,
+   "ny": 125
+  },
+  "europe": {
+   "bbox": [
+    34.0,
+    72.0,
+    -25.0,
+    45.0
+   ],
+   "file": "current-wind-10m-ecmwf-europe.json",
+   "nx": 281,
+   "ny": 153
+  },
+  "south-america": {
+   "bbox": [
+    -56.0,
+    13.0,
+    -92.0,
+    -30.0
+   ],
+   "file": "current-wind-10m-ecmwf-south-america.json",
+   "nx": 249,
+   "ny": 277
+  },
+  "africa": {
+   "bbox": [
+    -36.0,
+    37.5,
+    -26.0,
+    52.0
+   ],
+   "file": "current-wind-10m-ecmwf-africa.json",
+   "nx": 313,
+   "ny": 295
+  },
+  "asia": {
+   "bbox": [
+    -11.0,
+    60.0,
+    45.0,
+    150.0
+   ],
+   "file": "current-wind-10m-ecmwf-asia.json",
+   "nx": 421,
+   "ny": 285
+  },
+  "oceania": {
+   "bbox": [
+    -50.0,
+    0.0,
+    112.0,
+    180.0
+   ],
+   "file": "current-wind-10m-ecmwf-oceania.json",
+   "nx": 273,
+   "ny": 201
+  }
+ }
+}
