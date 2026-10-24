@@ -1,0 +1,28 @@
+{
+  "updated": "2026-10-24T13:36:55Z",
+  "levels": {
+    "surface": "ok",
+    "850mb": "ok",
+    "700mb": "ok",
+    "500mb": "ok"
+  },
+  "level_details": {
+    "surface": {
+      "height_agl_m": 10,
+      "typical_use": "fire behavior / surface flow"
+    },
+    "850mb": {
+      "altitude_amsl_ft": 5000,
+      "typical_use": "smoke transport, low-level jet"
+    },
+    "700mb": {
+      "altitude_amsl_ft": 10000,
+      "typical_use": "plume rise, mid-level flow"
+    },
+    "500mb": {
+      "altitude_amsl_ft": 18000,
+      "typical_use": "long-range spotting, upper flow"
+    }
+  },
+  "source": "NOAA NOMADS GFS 1p00 (analysis f000)"
+}
