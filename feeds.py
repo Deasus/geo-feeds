@@ -13,6 +13,8 @@ optional env vars passed through when set (keys that improve a feed but aren't n
 env      extra env vars
 keep_going  run every command even if one fails (independent fetchers + a final merge)
 ignore   patterns under data/ that are never published (caches, temp files)
+backoff  seconds between tries at most while the feed keeps failing: from the third failure in a row
+         the wait doubles, up to this; the first success goes back to `every` (be polite to a down upstream)
 """
 
 FEEDS = {
@@ -22,7 +24,7 @@ FEEDS = {
     'goes-fire': {'code': ['goes_fire'], 'run': [['python', 'fetch_fdc.py']],
                   'every': 120, 'timeout': 300},
     'ngfs':      {'code': ['ngfs'], 'run': [['python', 'fetch_ngfs.py']],
-                  'every': 120, 'timeout': 300},
+                  'every': 120, 'timeout': 300, 'backoff': 1800},   # SSEC's host has returned 503 since 2026-10-21
     'aircraft':  {'code': ['aircraft'], 'run': [['python', 'fetch_aircraft.py']],
                   'every': 300, 'timeout': 240, 'optional': ['ADSBX_API_KEY']},
 

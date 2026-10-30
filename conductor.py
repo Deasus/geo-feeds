@@ -167,8 +167,10 @@ def run_feed(feed: str, spec: dict) -> None:
         st['runs'] = st.get('runs', 0) + 1
         if ok:
             st['last_ok'] = now_iso()
+            st['streak'] = 0
         else:
             st['failures'] = st.get('failures', 0) + 1
+            st['streak'] = st.get('streak', 0) + 1
         if published:
             st['last_published'] = now_iso()
     log(f'[{feed}] {"ok" if ok else "FAILED"} in {dur}s{" · published" if published else ""}')
@@ -190,7 +192,15 @@ def write_status(force=False) -> None:
 
 def due(feed: str, spec: dict, t: float) -> bool:
     st = status['feeds'].get(feed, {})
-    return not st.get('running') and t - st.get('last_start_ts', 0) >= spec['every']
+    return not st.get('running') and t - st.get('last_start_ts', 0) >= interval(spec, st)
+
+
+def interval(spec: dict, st: dict) -> float:
+    """`every`, or for a feed with `backoff` that keeps failing, doubled per failure from the third in a row, up to `backoff`."""
+    streak = st.get('streak', 0)
+    if not spec.get('backoff') or streak < 3:
+        return spec['every']
+    return min(spec['every'] * 2 ** (streak - 2), spec['backoff'])
 
 
 def main() -> int:
