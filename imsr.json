@@ -1,0 +1,984 @@
+{
+  "summary": {
+    "report_date_human": "Saturday October 31, 2026",
+    "report_time": "0730 MDT",
+    "national_preparedness_level": 1,
+    "initial_attack_activity": "Light (62 fires)",
+    "new_large_incidents": 1,
+    "large_fires_contained": 2,
+    "uncontained_large_fires": 7,
+    "cimts_committed": 0,
+    "nimos_committed": 0
+  },
+  "resource_summary": [
+    {
+      "gacc": "AICC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "NWCC",
+      "pl": 1,
+      "incidents": 8,
+      "cumulative_acres": 210778,
+      "crews": 2,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 216,
+      "change_in_personnel": -88
+    },
+    {
+      "gacc": "ONCC",
+      "pl": 2,
+      "incidents": 1,
+      "cumulative_acres": 1365,
+      "crews": 1,
+      "engines": 1,
+      "helicopters": 0,
+      "total_personnel": 22,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "OSCC",
+      "pl": 2,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "NRCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "GBCC",
+      "pl": 1,
+      "incidents": 2,
+      "cumulative_acres": 5040,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 6,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "SWCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "RMCC",
+      "pl": 2,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "EACC",
+      "pl": 1,
+      "incidents": 4,
+      "cumulative_acres": 1715,
+      "crews": 0,
+      "engines": 3,
+      "helicopters": 0,
+      "total_personnel": 113,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "SACC",
+      "pl": 2,
+      "incidents": 13,
+      "cumulative_acres": 5366,
+      "crews": 0,
+      "engines": 22,
+      "helicopters": 1,
+      "total_personnel": 124,
+      "change_in_personnel": -12
+    },
+    {
+      "gacc": "Total",
+      "pl": null,
+      "incidents": 28,
+      "cumulative_acres": 224264,
+      "crews": 3,
+      "engines": 26,
+      "helicopters": 1,
+      "total_personnel": 481,
+      "change_in_personnel": -100
+    }
+  ],
+  "gacc_sections": [
+    {
+      "gacc": "SACC",
+      "area": "Southern Area",
+      "preparedness_level": 2,
+      "new_fires": 28,
+      "new_large_incidents": 1,
+      "uncontained_large_fires": 3,
+      "narrative": "Bee Haven 2 24-06, Florida Forest Service. Twenty-eight miles northwest of Lake City, FL. Southern rough. Minimal fire behavior with smoldering. Hewitt Lane, South Carolina Forestry Commission. Seven miles south of Georgetown, SC. Timber and southern rough. Moderate fire behavior. Last report unless significant activity occurs. Redbud, Oklahoma DOF. Ten miles southeast of Wilburton, OK. Hardwood litter. No new information. Last narrative report unless new information is received.",
+      "large_fires": [
+        {
+          "name": "Bee Haven 2 24-06",
+          "unit": "FL-FLS",
+          "acres": 2060,
+          "acres_change": 0,
+          "pct": 85,
+          "ctn_or_comp": "Ctn",
+          "est_date": "12/25",
+          "personnel": 41,
+          "personnel_change": 0,
+          "crews": 0,
+          "engines": 5,
+          "helicopters": 1,
+          "structures_lost": 0,
+          "cost_to_date_usd": null,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "Hewitt Lane",
+          "unit": "SC-SCS",
+          "acres": 109,
+          "acres_change": 0,
+          "pct": 90,
+          "ctn_or_comp": "Ctn",
+          "est_date": "11/4",
+          "personnel": 7,
+          "personnel_change": -1,
+          "crews": 0,
+          "engines": 1,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 6000,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "Redbud",
+          "unit": "OK-OKS",
+          "acres": 198,
+          "acres_change": null,
+          "pct": 60,
+          "ctn_or_comp": "Ctn",
+          "est_date": "UNK",
+          "personnel": 5,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 2,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 5000,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "Range 47B",
+          "unit": "MS-MNF",
+          "acres": 800,
+          "acres_change": 408,
+          "pct": 100,
+          "ctn_or_comp": "Ctn",
+          "est_date": null,
+          "personnel": 8,
+          "personnel_change": -5,
+          "crews": 0,
+          "engines": 2,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 15000,
+          "origin_owner": "FS",
+          "is_new": false
+        },
+        {
+          "name": "Drakes Creek",
+          "unit": "LA-KIF",
+          "acres": 349,
+          "acres_change": null,
+          "pct": 100,
+          "ctn_or_comp": "Ctn",
+          "est_date": null,
+          "personnel": 9,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 2,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 5000,
+          "origin_owner": "FS",
+          "is_new": true
+        }
+      ]
+    },
+    {
+      "gacc": "NWCC",
+      "area": "Northwest Area",
+      "preparedness_level": 1,
+      "new_fires": 3,
+      "new_large_incidents": 0,
+      "uncontained_large_fires": 2,
+      "narrative": "Austin, Mt. Hood NF, USFS. Twenty-five miles southeast of Estacada, OR. Brush, timber and closed timber litter. Minimal fire behavior with smoldering. Area, road and trail closures in effect. Sisi, Okanogan-Wenatchee NF, USFS. Ten miles northwest of Stehekin, WA. Timber and closed timber litter. Minimal fire behavior with smoldering, creeping and backing. Residences threatened. Area, road and trail closures in effect.",
+      "large_fires": [
+        {
+          "name": "Austin",
+          "unit": "OR-MHF",
+          "acres": 12888,
+          "acres_change": 0,
+          "pct": 98,
+          "ctn_or_comp": "Ctn",
+          "est_date": "11/30",
+          "personnel": 101,
+          "personnel_change": -1,
+          "crews": 0,
+          "engines": 0,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 87500000,
+          "origin_owner": "FS",
+          "is_new": false
+        },
+        {
+          "name": "Sisi",
+          "unit": "WA-OWF",
+          "acres": 4816,
+          "acres_change": 42,
+          "pct": 40,
+          "ctn_or_comp": "Ctn",
+          "est_date": "10/31",
+          "personnel": 28,
+          "personnel_change": 0,
+          "crews": 0,
+          "engines": 0,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 9600000,
+          "origin_owner": "FS",
+          "is_new": false
+        }
+      ]
+    },
+    {
+      "gacc": "EACC",
+      "area": "Eastern Area",
+      "preparedness_level": 1,
+      "new_fires": 14,
+      "new_large_incidents": 0,
+      "uncontained_large_fires": 2,
+      "narrative": "Ridge, Michigan DNR. Six miles north of Negaunee, MI. Timber and hardwood litter. No new information. Cherry Plain, New York State Department of Environmental Conservation. Seven miles northeast of Stephentown, NY. Hardwood litter. No new information. Last narrative report unless new information is received.",
+      "large_fires": [
+        {
+          "name": "Ridge",
+          "unit": "MI-MIS",
+          "acres": 496,
+          "acres_change": null,
+          "pct": 50,
+          "ctn_or_comp": "Ctn",
+          "est_date": "11/30",
+          "personnel": 3,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 1,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 250000,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "Cherry Plain",
+          "unit": "NY-NYS",
+          "acres": 251,
+          "acres_change": null,
+          "pct": 99,
+          "ctn_or_comp": "Ctn",
+          "est_date": "10/31",
+          "personnel": 106,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 0,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 20000,
+          "origin_owner": "ST",
+          "is_new": false
+        }
+      ]
+    }
+  ],
+  "large_fires_by_gacc": {
+    "SACC": [
+      {
+        "name": "Bee Haven 2 24-06",
+        "unit": "FL-FLS",
+        "acres": 2060,
+        "acres_change": 0,
+        "pct": 85,
+        "ctn_or_comp": "Ctn",
+        "est_date": "12/25",
+        "personnel": 41,
+        "personnel_change": 0,
+        "crews": 0,
+        "engines": 5,
+        "helicopters": 1,
+        "structures_lost": 0,
+        "cost_to_date_usd": null,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "Hewitt Lane",
+        "unit": "SC-SCS",
+        "acres": 109,
+        "acres_change": 0,
+        "pct": 90,
+        "ctn_or_comp": "Ctn",
+        "est_date": "11/4",
+        "personnel": 7,
+        "personnel_change": -1,
+        "crews": 0,
+        "engines": 1,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 6000,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "Redbud",
+        "unit": "OK-OKS",
+        "acres": 198,
+        "acres_change": null,
+        "pct": 60,
+        "ctn_or_comp": "Ctn",
+        "est_date": "UNK",
+        "personnel": 5,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 2,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 5000,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "Range 47B",
+        "unit": "MS-MNF",
+        "acres": 800,
+        "acres_change": 408,
+        "pct": 100,
+        "ctn_or_comp": "Ctn",
+        "est_date": null,
+        "personnel": 8,
+        "personnel_change": -5,
+        "crews": 0,
+        "engines": 2,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 15000,
+        "origin_owner": "FS",
+        "is_new": false
+      },
+      {
+        "name": "Drakes Creek",
+        "unit": "LA-KIF",
+        "acres": 349,
+        "acres_change": null,
+        "pct": 100,
+        "ctn_or_comp": "Ctn",
+        "est_date": null,
+        "personnel": 9,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 2,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 5000,
+        "origin_owner": "FS",
+        "is_new": true
+      }
+    ],
+    "NWCC": [
+      {
+        "name": "Austin",
+        "unit": "OR-MHF",
+        "acres": 12888,
+        "acres_change": 0,
+        "pct": 98,
+        "ctn_or_comp": "Ctn",
+        "est_date": "11/30",
+        "personnel": 101,
+        "personnel_change": -1,
+        "crews": 0,
+        "engines": 0,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 87500000,
+        "origin_owner": "FS",
+        "is_new": false
+      },
+      {
+        "name": "Sisi",
+        "unit": "WA-OWF",
+        "acres": 4816,
+        "acres_change": 42,
+        "pct": 40,
+        "ctn_or_comp": "Ctn",
+        "est_date": "10/31",
+        "personnel": 28,
+        "personnel_change": 0,
+        "crews": 0,
+        "engines": 0,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 9600000,
+        "origin_owner": "FS",
+        "is_new": false
+      }
+    ],
+    "EACC": [
+      {
+        "name": "Ridge",
+        "unit": "MI-MIS",
+        "acres": 496,
+        "acres_change": null,
+        "pct": 50,
+        "ctn_or_comp": "Ctn",
+        "est_date": "11/30",
+        "personnel": 3,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 1,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 250000,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "Cherry Plain",
+        "unit": "NY-NYS",
+        "acres": 251,
+        "acres_change": null,
+        "pct": 99,
+        "ctn_or_comp": "Ctn",
+        "est_date": "10/31",
+        "personnel": 106,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 0,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 20000,
+        "origin_owner": "ST",
+        "is_new": false
+      }
+    ]
+  },
+  "yesterday_by_protection": {
+    "by_area": [
+      {
+        "area": "Alaska",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Northwest",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 1,
+          "USFS": 2,
+          "TOTAL": 3
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 2,
+          "USFS": 0,
+          "TOTAL": 2
+        }
+      },
+      {
+        "area": "Northern California",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 10,
+          "USFS": 0,
+          "TOTAL": 10
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 5,
+          "USFS": 0,
+          "TOTAL": 5
+        }
+      },
+      {
+        "area": "Southern California",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 4,
+          "USFS": 1,
+          "TOTAL": 5
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 5,
+          "USFS": 0,
+          "TOTAL": 5
+        }
+      },
+      {
+        "area": "Northern Rockies",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Great Basin",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Southwest",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 1,
+          "TOTAL": 1
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Rocky Mountain",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 1,
+          "USFS": 0,
+          "TOTAL": 1
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Eastern Area",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 13,
+          "USFS": 1,
+          "TOTAL": 14
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 6,
+          "USFS": 5,
+          "TOTAL": 11
+        }
+      },
+      {
+        "area": "Southern Area",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 25,
+          "USFS": 3,
+          "TOTAL": 28
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 93,
+          "USFS": 487,
+          "TOTAL": 580
+        }
+      }
+    ],
+    "totals": {
+      "fires": {
+        "BIA": 0,
+        "BLM": 0,
+        "FWS": 0,
+        "NPS": 0,
+        "ST_OT": 54,
+        "USFS": 8,
+        "TOTAL": 62
+      },
+      "acres": {
+        "BIA": 0,
+        "BLM": 0,
+        "FWS": 0,
+        "NPS": 0,
+        "ST_OT": 110,
+        "USFS": 493,
+        "TOTAL": 603
+      }
+    }
+  },
+  "ytd_by_protection": {
+    "by_area": [
+      {
+        "area": "Alaska",
+        "fires": {
+          "BIA": 0,
+          "BLM": 149,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 231,
+          "USFS": 41,
+          "TOTAL": 421
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 36761,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 52184,
+          "USFS": 12,
+          "TOTAL": 88957
+        }
+      },
+      {
+        "area": "Northwest",
+        "fires": {
+          "BIA": 262,
+          "BLM": 313,
+          "FWS": 28,
+          "NPS": 52,
+          "ST_OT": 1922,
+          "USFS": 866,
+          "TOTAL": 3443
+        },
+        "acres": {
+          "BIA": 231646,
+          "BLM": 1978262,
+          "FWS": 34146,
+          "NPS": 19038,
+          "ST_OT": 566011,
+          "USFS": 519369,
+          "TOTAL": 3348473
+        }
+      },
+      {
+        "area": "Northern California",
+        "fires": {
+          "BIA": 62,
+          "BLM": 18,
+          "FWS": 2,
+          "NPS": 33,
+          "ST_OT": 2398,
+          "USFS": 422,
+          "TOTAL": 2935
+        },
+        "acres": {
+          "BIA": 7736,
+          "BLM": 70418,
+          "FWS": 5,
+          "NPS": 53,
+          "ST_OT": 20095,
+          "USFS": 8376,
+          "TOTAL": 106683
+        }
+      },
+      {
+        "area": "Southern California",
+        "fires": {
+          "BIA": 10,
+          "BLM": 79,
+          "FWS": 5,
+          "NPS": 46,
+          "ST_OT": 3527,
+          "USFS": 385,
+          "TOTAL": 4052
+        },
+        "acres": {
+          "BIA": 2,
+          "BLM": 9646,
+          "FWS": 4,
+          "NPS": 25604,
+          "ST_OT": 147013,
+          "USFS": 54459,
+          "TOTAL": 236728
+        }
+      },
+      {
+        "area": "Northern Rockies",
+        "fires": {
+          "BIA": 292,
+          "BLM": 113,
+          "FWS": 7,
+          "NPS": 4,
+          "ST_OT": 1530,
+          "USFS": 596,
+          "TOTAL": 2542
+        },
+        "acres": {
+          "BIA": 20721,
+          "BLM": 9462,
+          "FWS": 520,
+          "NPS": 6,
+          "ST_OT": 66390,
+          "USFS": 115467,
+          "TOTAL": 212566
+        }
+      },
+      {
+        "area": "Great Basin",
+        "fires": {
+          "BIA": 46,
+          "BLM": 1174,
+          "FWS": 3,
+          "NPS": 44,
+          "ST_OT": 1059,
+          "USFS": 539,
+          "TOTAL": 2865
+        },
+        "acres": {
+          "BIA": 3172,
+          "BLM": 1257775,
+          "FWS": 2,
+          "NPS": 784,
+          "ST_OT": 274842,
+          "USFS": 393255,
+          "TOTAL": 1929830
+        }
+      },
+      {
+        "area": "Southwest",
+        "fires": {
+          "BIA": 694,
+          "BLM": 214,
+          "FWS": 5,
+          "NPS": 30,
+          "ST_OT": 817,
+          "USFS": 1036,
+          "TOTAL": 2796
+        },
+        "acres": {
+          "BIA": 3644,
+          "BLM": 6414,
+          "FWS": 7131,
+          "NPS": 806,
+          "ST_OT": 81018,
+          "USFS": 113646,
+          "TOTAL": 212658
+        }
+      },
+      {
+        "area": "Rocky Mountain",
+        "fires": {
+          "BIA": 192,
+          "BLM": 506,
+          "FWS": 17,
+          "NPS": 35,
+          "ST_OT": 1611,
+          "USFS": 451,
+          "TOTAL": 2812
+        },
+        "acres": {
+          "BIA": 1682,
+          "BLM": 24965,
+          "FWS": 3964,
+          "NPS": 1412,
+          "ST_OT": 1330669,
+          "USFS": 210789,
+          "TOTAL": 1573480
+        }
+      },
+      {
+        "area": "Eastern Area",
+        "fires": {
+          "BIA": 223,
+          "BLM": 0,
+          "FWS": 25,
+          "NPS": 16,
+          "ST_OT": 8764,
+          "USFS": 389,
+          "TOTAL": 9417
+        },
+        "acres": {
+          "BIA": 1086,
+          "BLM": 0,
+          "FWS": 344,
+          "NPS": 17,
+          "ST_OT": 85576,
+          "USFS": 86298,
+          "TOTAL": 173320
+        }
+      },
+      {
+        "area": "Southern Area",
+        "fires": {
+          "BIA": 1165,
+          "BLM": 2,
+          "FWS": 111,
+          "NPS": 127,
+          "ST_OT": 34088,
+          "USFS": 802,
+          "TOTAL": 36295
+        },
+        "acres": {
+          "BIA": 87855,
+          "BLM": 72,
+          "FWS": 52776,
+          "NPS": 44931,
+          "ST_OT": 1256729,
+          "USFS": 63718,
+          "TOTAL": 1506080
+        }
+      }
+    ],
+    "totals": {
+      "fires": {
+        "BIA": 2946,
+        "BLM": 2568,
+        "FWS": 203,
+        "NPS": 387,
+        "ST_OT": 55947,
+        "USFS": 5527,
+        "TOTAL": 67578
+      },
+      "acres": {
+        "BIA": 357543,
+        "BLM": 3393775,
+        "FWS": 98893,
+        "NPS": 92650,
+        "ST_OT": 3880526,
+        "USFS": 1565389,
+        "TOTAL": 9388775
+      }
+    },
+    "ten_year_average": {
+      "fires": 50858,
+      "acres": 6432946
+    }
+  },
+  "predictive_services_discussion": "Very dry air is expected in the central and southern Appalachians with minimum relative humidity falling to 20- 30%, with local areas in the teens. However, winds are expected to be light today. Farther north, locally breezy northwest winds will develop in New England amid minimum relative humidity as low as 30% creating locally elevated conditions along the Maine coast. Above normal temperatures will continue in the Mississippi Valley, but Gulf moisture will move northward with widespread showers and scattered thunderstorms in the Lower to Mid-Mississippi Valley bringing some relief from the recent very dry conditions. Farther north into the Great Lakes, precipitation will be much more isolated and light. In the West, deep tropical moisture will move northward through southern California and Arizona into the Great Basin with widespread showers and isolated thunderstorms, with scattered and light showers for northern California and the Northwest. Strong southerly winds will begin to wind down today across the Alaska Range, while scattered light precipitation occurs in western and south-central Alaska. Trade winds will weaken across Hawai’i amid a moist airmass but showers will be less than previous days and mostly occur on the windward sides. National Predictive Services Outlook (7-Day Significant Fire Potential Outlook) National Weather Service, Storm Prediction Center: Fire Weather Outlook Map and discussion National Weather Service: Fire Weather Hazards Map National Weather Service, Weather Prediction Center: National Forecast Chart and Short Range Forecast Discussion 6 Minutes for Safety topics can be found here.",
+  "parse_warnings": [],
+  "generated_utc": "2026-10-31T18:16:55Z",
+  "source_url": "https://www.nifc.gov/nicc-files/sitreprt.pdf",
+  "pdf_bytes": 194919,
+  "fetch": {
+    "fetched_utc": "2026-10-31T18:16:54Z",
+    "duration_seconds": 0.11
+  }
+}
