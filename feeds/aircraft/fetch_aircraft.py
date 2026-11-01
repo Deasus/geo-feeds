@@ -83,6 +83,7 @@ ADSBX_REG_URL = 'https://adsbexchange.com/api/aircraft/v2/registration/{regs}/'
 # v3 caps radius at 250 nm, so its failover sweep covers less).
 PRIMARY = 'https://api.adsb.lol/v2/point'            # /{lat}/{lng}/{radius}
 FAILOVER = 'https://opendata.adsb.fi/api/v3'         # /lat/{lat}/lon/{lng}/dist/{<=250}
+MIL_URL = 'https://api.adsb.lol/v2/mil'              # one global call: the database's military list
 ADSB_FI_MAX_NM = 250
 INTER_POLL_DELAY = 0.5
 
@@ -285,6 +286,44 @@ def fetch_region(name: str, lat: float, lng: float, radius: int, session: reques
 
 
 # ── Main ──────────────────────────────────────────────────────────────
+def merge_military(registry: dict[str, dict], session: requests.Session) -> int:
+    """Seed the registry with the global military list; the callsign classifier only catches a
+    fraction of these. Runs before the sweep, while the upstream's rate budget is unspent. Best
+    effort: the sweep stands without it."""
+    try:
+        r = session.get(MIL_URL, timeout=REGION_TIMEOUT_SEC)
+        r.raise_for_status()
+        ac_list = r.json().get('ac') or []
+    except Exception as e:
+        print(f'  [mil] failed: {e}')
+        return 0
+    for ac in ac_list:
+        hex_id = (ac.get('hex') or '').lower()
+        if not hex_id or ac.get('lat') is None or ac.get('lon') is None:
+            continue
+        registry[hex_id] = {
+            'hex':      hex_id,
+            'flight':   (ac.get('flight') or '').strip(),
+            'r':        ac.get('r') or '',
+            't':        ac.get('t') or '',
+            'category': ac.get('category') or '',
+            'lat':      ac.get('lat'),
+            'lon':      ac.get('lon'),
+            'alt_baro': ac.get('alt_baro'),
+            'alt_geom': ac.get('alt_geom'),
+            'gs':       ac.get('gs'),
+            'track':    ac.get('track'),
+            'squawk':   ac.get('squawk'),
+            'emergency': ac.get('emergency') or 'none',
+            'ownOp':    ac.get('ownOp') or '',
+            'year':     ac.get('year') or '',
+            '_category': 'military',
+            '_sourceRegion': 'mil',
+        }
+    print(f'  [mil] {len(ac_list)} aircraft')
+    return len(ac_list)
+
+
 def main() -> int:
     print('=' * 60)
     print('geo-feeds Aircraft Pipeline')
@@ -363,6 +402,7 @@ def main() -> int:
 
     # FAILOVER PATH: regional adsb.lol + adsb.fi sweep (airplanes.live dropped 2026-10-05).
     print('[FAILOVER] ADSBx unavailable, falling back to regional sweep')
+    region_counts['mil'] = merge_military(registry, session)
     for name, lat, lng, radius in REGIONS:
         # 2026-05-29: watchdog — if both endpoints have died, no point looping;
         # likewise stop if we're past the global deadline. Either case writes
