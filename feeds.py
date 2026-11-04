@@ -54,6 +54,9 @@ FEEDS = {
                   'requires': ['CDS_API_TOKEN']},
     'satellite': {'code': ['satellite'], 'run': [['python', 'fetch_tles.py']], 'every': 86400, 'timeout': 300},
 
+    # ── mirrors of public agency/hazard feeds whose origins send no CORS headers (QLD bushfire warnings, NHC storms) ──
+    'agency':    {'code': ['agency'], 'run': [['python', 'fetch_agency.py']], 'every': 600, 'timeout': 300},
+
     # ── weekly deconfliction reference (industrial sites, volcanoes, flares, persistent hotspots) ──
     'industrial': {'code': ['industrial'], 'every': 604800, 'timeout': 2400, 'keep_going': True,
                    'run': [['python', 'fetch_epa_frs.py'], ['python', 'fetch_gvp.py'],
