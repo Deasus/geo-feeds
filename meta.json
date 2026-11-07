@@ -1,0 +1,75 @@
+{
+  "updated": "2026-11-07T16:01:54Z",
+  "schema_version": 2,
+  "fields": {
+    "wind": {
+      "vars": [
+        "u10",
+        "v10"
+      ],
+      "level": "10 m above ground",
+      "units": "m/s"
+    },
+    "thermo": {
+      "vars": [
+        "t2m",
+        "r2"
+      ],
+      "level": "2 m above ground",
+      "units": [
+        "K",
+        "%"
+      ]
+    }
+  },
+  "regions": {
+    "conus": {
+      "region": "conus",
+      "wind": {
+        "ok": true,
+        "kind": "wind",
+        "run": "2026110714z",
+        "shape": [
+          280,
+          630
+        ],
+        "size_mb": 6.21
+      },
+      "thermo": {
+        "ok": true,
+        "kind": "thermo",
+        "run": "2026110714z",
+        "shape": [
+          280,
+          630
+        ],
+        "size_mb": 5.78
+      }
+    },
+    "alaska": {
+      "region": "alaska",
+      "wind": {
+        "ok": true,
+        "kind": "wind",
+        "run": "2026110712z",
+        "shape": [
+          246,
+          586
+        ],
+        "size_mb": 5.01
+      },
+      "thermo": {
+        "ok": true,
+        "kind": "thermo",
+        "run": "2026110712z",
+        "shape": [
+          246,
+          586
+        ],
+        "size_mb": 4.58
+      }
+    }
+  },
+  "source": "NOAA NOMADS HRRR (cfgrib + scipy griddata resample)",
+  "pipeline": "https://github.com/Deasus/geo-feeds"
+}
