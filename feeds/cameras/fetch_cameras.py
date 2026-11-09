@@ -26,7 +26,7 @@ written redistribution terms with AlertWest/ALERTCalifornia before wide rollout.
 
 OUTPUT: data/cameras.json
 Shape: { "generated_at": ISO8601, "count": N, "source": "AlertWest",
-         "cameras": [ {name, lat, lng, state, county, img, src}, ... ] }
+         "cameras": [ {name, lat, lng, state, county, img, src, pan?, tilt?, zoom?, model?, t?}, ... ] }
 
 SOURCE: https://alertwest.live/api/firecams/v0/cameras  (public, no auth)
 Requires: only the Python stdlib (urllib) — no third-party deps.
@@ -77,6 +77,20 @@ def main() -> int:
         }
         if pan is not None:
             rec["pan"] = pan   # compass degrees the PTZ camera is currently pointing
+        # CINDER v2_26 (the confirm card) — what the field of view needs: tilt, optical zoom and the camera model
+        # (Axis Q6075-E 65.1-2.0 deg, Q6055-E 62.8-2.23 deg horizontal), and when the frame/position was taken.
+        for key, src in (("tilt", pos.get("tilt")), ("zoom", pos.get("zoom"))):
+            if src not in (None, ""):
+                try:
+                    rec[key] = round(float(src), 2)
+                except (TypeError, ValueError):
+                    pass
+        model = (c.get("parameters") or {}).get("Brand.ProdNbr")
+        if model:
+            rec["model"] = str(model)[:24]
+        t = (c.get("image") or {}).get("time") or pos.get("time")
+        if t:
+            rec["t"] = t
         cams.append(rec)
 
     payload = {
