@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-13T16:36:03+00:00",
+  "source": "celestrak.org",
+  "satellite_count": 4,
+  "satellites": [
+    {
+      "id": "sentinel2a",
+      "name": "SENTINEL-2A",
+      "platform": "Copernicus",
+      "sensor": "MSI",
+      "swath_km": 290,
+      "color": "#b388ff",
+      "norad": 40697,
+      "tle1": "1 40697U 15028A   26317.51526645  .00000412  00000+0  17365-3 0  9996",
+      "tle2": "2 40697  98.5671  30.1741 0001171  95.3957 264.7359 14.30817115595082"
+    },
+    {
+      "id": "sentinel2b",
+      "name": "SENTINEL-2B",
+      "platform": "Copernicus",
+      "sensor": "MSI",
+      "swath_km": 290,
+      "color": "#9d6dff",
+      "norad": 42063,
+      "tle1": "1 42063U 17013A   26316.73897712  .00000369  00000+0  15744-3 0  9990",
+      "tle2": "2 42063  98.5720  29.3933 0001117  93.9382 266.1929 14.30821573505886"
+    },
+    {
+      "id": "sentinel3a",
+      "name": "SENTINEL-3A",
+      "platform": "Copernicus",
+      "sensor": "OLCI",
+      "swath_km": 1270,
+      "color": "#7a4fff",
+      "norad": 41335,
+      "tle1": "1 41335U 16011A   26317.45290463  .00000107  00000+0  62078-4 0  9991",
+      "tle2": "2 41335  98.6297  22.6803 0001241  85.7499 274.3823 14.26735219559345"
+    },
+    {
+      "id": "sentinel3b",
+      "name": "SENTINEL-3B",
+      "platform": "Copernicus",
+      "sensor": "OLCI",
+      "swath_km": 1270,
+      "color": "#5e3bff",
+      "norad": 43437,
+      "tle1": "1 43437U 18039A   26317.14551294  .00000107  00000+0  62202-4 0  9995",
+      "tle2": "2 43437  98.6300  22.5265 0000827 128.4795 231.6460 14.26735827445363"
+    }
+  ]
+}
