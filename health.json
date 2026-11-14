@@ -1,0 +1,9 @@
+{
+  "last_success_utc": "2026-11-14T13:03:40Z",
+  "consecutive_failures": 0,
+  "status": "ok",
+  "last_attempt_utc": "2026-11-14T13:03:40Z",
+  "last_notes": "parsed pl=1 large_fires=4",
+  "cadence_minutes": 15,
+  "last_failure_utc": "2026-11-06T07:47:09Z"
+}
