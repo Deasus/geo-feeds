@@ -136,7 +136,10 @@ class Deconflicter:
         has_land        bool — True if the land polygon was loaded (offshore test enabled)
     """
 
-    def __init__(self) -> None:
+    def __init__(self, legacy_reach: bool = False) -> None:
+        # legacy_reach (2026-11-16 review): the pre-2026-11-16 test — the NEAREST source only, distance <= buffer_m — for callers
+        # that pass no pixel size (the geostationary feeds via _shared/geo_common.py, which add their own pixel-scale floor)
+        self.legacy_reach = legacy_reach
         self.loaded = False
         self.has_land = False
         self.n_sources = 0
@@ -291,10 +294,11 @@ class Deconflicter:
         if not cands:
             return out
         pick = None
-        for i, dist_m in cands:
+        for i, dist_m in (cands[:1] if self.legacy_reach else cands):
             props = self._props[i]
             buffer_m = props.get('buffer_m') or _default_buffer(props.get('class'))
-            if dist_m <= effective_buffer_m(buffer_m, det):
+            reach = buffer_m if self.legacy_reach else effective_buffer_m(buffer_m, det)
+            if dist_m <= reach:
                 pick = (i, dist_m)
                 break
         i, dist_m = pick or cands[0]

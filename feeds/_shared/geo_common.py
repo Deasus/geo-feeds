@@ -82,7 +82,10 @@ def deconflict(dets: list, min_buffer_m: int = 0):
     km-scale geolocation error, so a flare or refinery routinely lands outside a
     500 m buffer. min_buffer_m raises every buffer to at least the pixel scale."""
     from deconflict import Deconflicter
-    dc = Deconflicter()
+    # legacy_reach: these rows carry no scan/track/sensor, so the pixel-sized test (2026-11-16) would read them as VIIRS
+    # pixels and reach ~365 m further than before (heat 5.0–5.37 km from a volcano summit would move to suppressed);
+    # min_buffer_m below is these feeds' own pixel-scale floor, unchanged
+    dc = Deconflicter(legacy_reach=True)
     dc.load()                                   # best effort; never raises
     rows = [{'lat': d['lat'], 'lng': d['lng'],
              'confidence': str(d['conf']) if d.get('conf') is not None else None} for d in dets]
