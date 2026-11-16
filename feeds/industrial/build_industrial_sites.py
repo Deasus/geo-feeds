@@ -238,7 +238,8 @@ def main() -> int:
                                f'{int(nasa.get("grid_m", 400))} m grid, >= {nasa.get("min_detections", 5)} detections in the year',
             }))
         source_summary.append({'source': 'nasa_static', 'generated': nasa.get('generated_utc'), 'year': yr,
-                               'countries': nasa.get('countries'), 'count': len(features) - n_before, 'method': nasa.get('method')})
+                               'countries': nasa.get('countries'), 'count': len(features) - n_before, 'method': nasa.get('method'),
+                               'attribution': nasa.get('attribution'), 'licence': nasa.get('licence')})
         sys.stderr.write(f'[merge] +{len(features) - n_before} NASA static land sources ({yr})\n')
 
     # ---- Carry forward any source whose stage is missing this run ----
