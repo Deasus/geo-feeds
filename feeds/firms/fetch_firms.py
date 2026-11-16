@@ -215,6 +215,10 @@ def fetch_source(source: str) -> list[dict]:
             'sensor': 'MODIS' if 'MODIS' in source else 'VIIRS',
             'src': source,   # which FIRMS source produced the row: lets a failed source carry forward
             'daynight': r.get('daynight') or None,
+            # the pixel footprint (km), for the known-source test only; popped after enrichment
+            # so the published rows stay byte-compatible (deconflict.effective_buffer_m)
+            'scan': r.get('scan') or None,
+            'track': r.get('track') or None,
         }
         rows.append(det)
     # v2_deconflict-mvp enrichment, batched (2026-10-16): one BallTree query for the
@@ -225,6 +229,9 @@ def fetch_source(source: str) -> list[dict]:
         sys.stderr.write(f'[deconflict] batch enrichment failed: {_e}\n')
         for det in rows:
             det.setdefault('deconfliction_flag', 'clear')
+    for det in rows:
+        det.pop('scan', None)
+        det.pop('track', None)
     return rows
 
 

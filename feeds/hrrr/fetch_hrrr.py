@@ -17,6 +17,21 @@ Alaska: fetched via GRIB2 byte-range from the full surface file.
 Refresh: hourly (CONUS) / every 3h (Alaska) via GHA cron. Frontend
 treats missing/stale thermo as "fall back to BI-only HDW proxy."
 
+WIND DIRECTION (2026-11-16): HRRR stores u/v relative to its own grid (CONUS:
+Lambert conformal, LoV -97.5, Latin 38.5; Alaska: polar stereographic, LoV 225).
+The published file is a regular lat/lng grid, so u/v must be earth-relative
+(east/north). Before this date they were resampled unrotated, so directions were
+off by up to the local grid convergence (~15° on the West Coast, a median 11.8° at
+189 western 2025 fires). Now each message's resolution-and-component flags (GRIB2
+Table 3.3, bit 5) are read; when the components are grid-relative they are rotated
+on the native grid, with the projection's own LoV (polar stereo: orientationOfTheGrid) /
+Latin1 / Latin2 / pole from the grid definition (Section 3), BEFORE the resample:
+    angle = n · (lon − LoV)        n = cone constant (Lambert), ±1 (polar stereo)
+    u_e = cos(angle)·u + sin(angle)·v ;  v_e = −sin(angle)·u + cos(angle)·v
+(the NCEP rotation, as wgrib2 -new_grid_winds earth). meta.json records it per region.
+A grid-relative message on a projection this code cannot rotate fails the region
+(the last good file stays published) instead of publishing wrong directions.
+
 Backlog — Option 3 in the geo-feeds hierarchy: extend to regional
 high-resolution models for international coverage (ICON-EU / AROME /
 ACCESS-C / HRDPS). Deferred — audience is US-primary.
@@ -30,9 +45,15 @@ import datetime as dt
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 
+import math
+
 import numpy as np
 import xarray as xr
 from scipy.interpolate import griddata
+
+# GRIB keys read with the wind (cfgrib read_keys): the grid definition and the component flags
+GRID_KEYS = ["gridType", "LoVInDegrees", "orientationOfTheGridInDegrees", "Latin1InDegrees", "Latin2InDegrees",
+             "projectionCentreFlag", "resolutionAndComponentFlags", "uvRelativeToGrid"]
 
 
 NOMADS_BASE = "https://nomads.ncep.noaa.gov"
@@ -190,17 +211,93 @@ def _fetch_alaska_thermo(date, run, dest_path):
 
 # ── GRIB2 parse + resample ───────────────────────────────────────────
 
-def _open_filtered_dataset(grib_path, filter_keys):
+def _open_filtered_dataset(grib_path, filter_keys, read_keys=None):
     """
     Open a GRIB2 file with cfgrib, optionally filtering by keys
-    (typeOfLevel, level). Returns the xr.Dataset.
+    (typeOfLevel, level). Returns the xr.Dataset. read_keys adds GRIB keys
+    to each variable's attrs as GRIB_<key>.
     """
-    backend_kwargs = {"filter_by_keys": filter_keys} if filter_keys else None
+    backend_kwargs = {}
+    if filter_keys:
+        backend_kwargs["filter_by_keys"] = filter_keys
+    if read_keys:
+        backend_kwargs["read_keys"] = list(read_keys)
     return xr.open_dataset(
         grib_path,
         engine="cfgrib",
-        backend_kwargs=backend_kwargs,
+        backend_kwargs=backend_kwargs or None,
     )
+
+
+# ── Grid-relative → earth-relative winds ─────────────────────────────
+
+def grid_of(attrs):
+    """The rotation-relevant grid definition from a cfgrib variable's attrs (GRIB_<key>)."""
+    g = {}
+    for k in GRID_KEYS:
+        v = attrs.get("GRIB_" + k)
+        if v is not None and not (isinstance(v, float) and math.isnan(v)):
+            g[k] = v
+    return g
+
+
+def uv_relative_to_grid(grid):
+    """GRIB2 Table 3.3 bit 5 (value 8): 1 = u/v resolved along the grid's x/y, 0 = along east/north.
+    The flags win; ecCodes' derived uvRelativeToGrid is the fallback. None = unknown."""
+    flags = grid.get("resolutionAndComponentFlags")
+    if flags is not None:
+        try:
+            return bool(int(flags) & 0x08)
+        except (TypeError, ValueError):
+            pass
+    rel = grid.get("uvRelativeToGrid")
+    return None if rel is None else bool(int(rel))
+
+
+def rotation_constant(grid):
+    """n in angle = n·(lon − LoV): the Lambert cone constant (one or two standard parallels), ±1 for
+    polar stereographic (south when projectionCentreFlag bit 1 is set). None = not a projection this
+    code rotates."""
+    t = str(grid.get("gridType") or "")
+    if t == "lambert":
+        p1 = math.radians(float(grid["Latin1InDegrees"]))
+        p2 = math.radians(float(grid.get("Latin2InDegrees", grid["Latin1InDegrees"])))
+        if abs(p1 - p2) < 1e-9:
+            return math.sin(p1)
+        return (math.log(math.cos(p1) / math.cos(p2))
+                / math.log(math.tan(math.pi / 4 + p2 / 2) / math.tan(math.pi / 4 + p1 / 2)))
+    if t == "polar_stereographic":
+        south = int(grid.get("projectionCentreFlag", 0) or 0) & 0x80
+        return -1.0 if south else 1.0
+    return None
+
+
+def rotate_to_earth(u, v, lng, grid):
+    """Earth-relative (u, v) from grid-relative components at longitudes lng (degrees, any range).
+    Returns (u_e, v_e, info). Arrays keep their shape. When the grid says the components are already
+    earth-relative they come back unchanged."""
+    rel = uv_relative_to_grid(grid)
+    info = {"gridType": grid.get("gridType"), "uvRelativeToGrid": rel, "rotated": False}
+    if rel is False:
+        return u, v, info
+    if rel is None:
+        raise RuntimeError(f"wind components: cannot tell grid- from earth-relative (keys {sorted(grid)})")
+    n = rotation_constant(grid)
+    if n is None:
+        raise RuntimeError(f"wind components are grid-relative on a {grid.get('gridType')!r} grid; no rotation known")
+    lov = grid.get("LoVInDegrees", grid.get("orientationOfTheGridInDegrees"))   # Lambert: LoV; polar stereo: orientationOfTheGrid
+    if lov is None:
+        raise RuntimeError(f"wind components are grid-relative but the grid has no LoV / orientation (keys {sorted(grid)})")
+    lov = float(lov)
+    dlon = (np.asarray(lng, dtype=np.float64) - lov + 540.0) % 360.0 - 180.0
+    ang = np.radians(n * dlon)
+    c, s_ = np.cos(ang), np.sin(ang)
+    u = np.asarray(u, dtype=np.float64)
+    v = np.asarray(v, dtype=np.float64)
+    info.update(rotated=True, LoV=lov, n=round(n, 6),
+                Latin1=grid.get("Latin1InDegrees"), Latin2=grid.get("Latin2InDegrees"),
+                max_abs_angle_deg=round(float(np.nanmax(np.abs(np.degrees(ang)))), 2))
+    return c * u + s_ * v, -s_ * u + c * v, info
 
 
 def _resample_to_regular(values_2d, src_lat_2d, src_lng_2d, target, region_name, method=None):
@@ -221,11 +318,22 @@ def _resample_to_regular(values_2d, src_lat_2d, src_lng_2d, target, region_name,
     ).astype(np.float32)
 
 
-def _resample_wind(grib_path, target, region_name):
-    print(f"  [wind] parsing {grib_path}...")
-    ds = _open_filtered_dataset(grib_path, {"typeOfLevel": "heightAboveGround", "level": 10})
+def _earth_relative_winds(ds):
+    """u10/v10 of a cfgrib dataset as earth-relative native-grid arrays, with what was done."""
     u = ds["u10"].values
     v = ds["v10"].values
+    gu, gv = grid_of(ds["u10"].attrs), grid_of(ds["v10"].attrs)
+    if uv_relative_to_grid(gu) != uv_relative_to_grid(gv):
+        raise RuntimeError("u10 and v10 disagree on grid- vs earth-relative components")
+    u, v, info = rotate_to_earth(u, v, ds.longitude.values, gu)
+    return u, v, info
+
+
+def _resample_wind(grib_path, target, region_name):
+    print(f"  [wind] parsing {grib_path}...")
+    ds = _open_filtered_dataset(grib_path, {"typeOfLevel": "heightAboveGround", "level": 10}, read_keys=GRID_KEYS)
+    u, v, rot = _earth_relative_winds(ds)
+    print(f"  [wind] components: {rot}")
     lat = ds.latitude.values
     lng = ds.longitude.values
     t0 = time.time()
@@ -235,7 +343,7 @@ def _resample_wind(grib_path, target, region_name):
     u_reg = np.nan_to_num(u_reg, nan=0.0)
     v_reg = np.nan_to_num(v_reg, nan=0.0)
     print(f"  [wind] resampled in {time.time()-t0:.1f}s → shape {u_reg.shape}")
-    return u_reg, v_reg
+    return u_reg, v_reg, rot
 
 
 def _resample_thermo(grib_path, target, region_name):
@@ -269,12 +377,13 @@ def _resample_thermo(grib_path, target, region_name):
 # ── Output writers ───────────────────────────────────────────────────
 
 def _write_wind_json(u, v, target, out_path):
-    """cambecc/earth wind JSON — UGRD param=2, VGRD param=3."""
+    """cambecc/earth wind JSON — UGRD param=2, VGRD param=3. u/v are earth-relative (east, north)."""
     header = {
         "parameterCategory": 2,
         "lo1": target["lo1"], "la1": target["la1"],
         "dx": target["dx"], "dy": target["dy"],
         "nx": target["nx"], "ny": target["ny"],
+        "uvEarthRelative": True,
     }
     records = [
         {"header": {**header, "parameterNumber": 2}, "data": u.ravel().tolist()},
@@ -344,7 +453,7 @@ def run_region(region_name, fetch_wind_fn, fetch_thermo_fn, hours_per_cycle):
         grib_path = os.path.join(DATA_DIR, f"_tmp_{region_name}_wind.grib2")
         try:
             fetch_wind_fn(date, run, grib_path)
-            u, v = _resample_wind(grib_path, TARGET[region_name], region_name)
+            u, v, rot = _resample_wind(grib_path, TARGET[region_name], region_name)
             out_path = os.path.join(DATA_DIR, f"current-wind-10m-hrrr-{region_name}.json")
             _write_wind_json(u, v, TARGET[region_name], out_path)
             os.remove(grib_path)
@@ -354,6 +463,7 @@ def run_region(region_name, fetch_wind_fn, fetch_thermo_fn, hours_per_cycle):
                 "run": f"{date}{run}z",
                 "shape": [TARGET[region_name]["ny"], TARGET[region_name]["nx"]],
                 "size_mb": round(os.path.getsize(out_path) / 1024 / 1024, 2),
+                "components": rot,
             }
             break
         except (HTTPError, URLError) as e:
@@ -409,11 +519,12 @@ def main():
         "updated": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "schema_version": 2,
         "fields": {
-            "wind":   {"vars": ["u10", "v10"], "level": "10 m above ground", "units": "m/s"},
+            "wind":   {"vars": ["u10", "v10"], "level": "10 m above ground", "units": "m/s",
+                       "components": "earth-relative (east, north): rotated from HRRR's grid-relative u/v since 2026-11-16"},
             "thermo": {"vars": ["t2m", "r2"],  "level": "2 m above ground",  "units": ["K", "%"]},
         },
         "regions": {r["region"]: r for r in results},
-        "source": "NOAA NOMADS HRRR (cfgrib + scipy griddata resample)",
+        "source": "NOAA NOMADS HRRR (cfgrib + earth-relative rotation + scipy griddata resample)",
         "pipeline": "https://github.com/Deasus/geo-feeds",
     }
     with open(os.path.join(DATA_DIR, "meta.json"), "w") as f:

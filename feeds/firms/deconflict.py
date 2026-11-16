@@ -15,8 +15,19 @@ lat/lng/frp/confidence shape), this module adds:
                                     proximate_volcano     (within buffer of GVP volcano summit)
                                     offshore              (detection is over water per Natural Earth 10m land)
 
-The buffer distance is per-source (each industrial site publishes its own
-buffer_m — MVP: 500m for EPA-FRS points, 5000m for GVP volcanoes).
+The buffer distance is per-source AND per-detection (2026-11-16). A known source
+explains a detection when the source can lie inside the detection's pixel:
+
+    distance <= buffer_m (the source's own extent, published per source)
+              + half the detection's pixel diagonal (FIRMS scan x track, km;
+                the GOES feed passes its pixel footprint the same way)
+              + GEOLOC_M (location error)
+
+Before 2026-11-16 the test was distance <= buffer_m (500 m), sized for a VIIRS
+pixel at nadir. A MODIS pixel at the scan edge is ~4.8 x 2 km and a VIIRS pixel
+~0.8 x 0.8 km, so heat from a landfill or a plant routinely landed outside 500 m.
+Every source within reach is tested, not only the nearest one (sources carry
+different buffers, so the nearest is not always the one that covers).
 
 Data-source URL is public — served from industrial feed-sites via
 raw.githubusercontent.com, same pattern as every other geo-feeds feed.
@@ -35,6 +46,7 @@ import json
 import math
 import os
 import sys
+import time
 import urllib.request
 import zipfile
 from typing import Optional
@@ -47,6 +59,51 @@ LAND_POLY_URL        = 'https://raw.githubusercontent.com/Deasus/geo-feeds/indus
 EARTH_RADIUS_M = 6_371_000.0
 
 HTTP_TIMEOUT = 30
+
+# The location-error term of the known-source test. FIRMS FAQ: the NRT location
+# error is "very small (< 100 meters)" for VIIRS and MODIS; GOES-16 ABI navigation
+# errors are about 1.5 µrad or less (Tan et al. 2018, SPIE 10764), ~60 m at the
+# western-US slant range. One 100 m term covers all three.
+GEOLOC_M = 100
+# Pixel size at nadir (km) for a row that carries no scan/track.
+NADIR_PIXEL_KM = {'VIIRS': 0.375, 'MODIS': 1.0, 'ABI': 2.0}
+# How many nearest sources are tested per detection (sources carry different buffers).
+K_CANDIDATES = 8
+
+
+def pixel_half_diag_m(det: dict) -> float:
+    """Half the diagonal of the detection's pixel footprint, metres: the farthest a
+    source inside that pixel can sit from the pixel centre FIRMS reports.
+    Uses the row's own scan/track (km, as FIRMS publishes them); otherwise the
+    sensor's nadir pixel."""
+    try:
+        scan = float(det.get('scan'))
+        track = float(det.get('track'))
+        if scan > 0 and track > 0:
+            return 500.0 * math.hypot(scan, track)
+    except (TypeError, ValueError):
+        pass
+    sensor = str(det.get('sensor') or det.get('instrument') or '').upper()
+    if not sensor:
+        sat = str(det.get('satellite') or '').strip()
+        sensor = 'MODIS' if sat in ('T', 'A', 'Terra', 'Aqua') else 'VIIRS'
+    px = NADIR_PIXEL_KM.get(sensor, NADIR_PIXEL_KM['VIIRS'])
+    return 500.0 * math.hypot(px, px)
+
+
+def effective_buffer_m(source_buffer_m: float, det: dict) -> float:
+    """The known-source test's reach for this source and this detection."""
+    return float(source_buffer_m) + pixel_half_diag_m(det) + GEOLOC_M
+
+
+def _flag_for_class(cls) -> str:
+    if cls == 'volcano':
+        return 'proximate_volcano'
+    if cls == 'industrial':
+        return 'proximate_industrial'
+    if cls == 'solar':
+        return 'proximate_solar'
+    return 'proximate_' + str(cls)
 
 
 def _http_json(url: str) -> Optional[dict]:
@@ -90,17 +147,42 @@ class Deconflicter:
         self._land_bboxes: list[tuple[float, float, float, float]] = []  # (minlat,maxlat,minlng,maxlng)
         self._land_polys: list[list[list[list[float]]]] = []             # per-poly list of rings
 
-    def load(self) -> None:
-        """Fetch both reference layers and build the spatial index. Idempotent."""
+    def load(self, land: bool = True, cache_path: Optional[str] = None, cache_max_age_s: int = 6 * 3600) -> None:
+        """Fetch both reference layers and build the spatial index. Idempotent.
+        land=False skips the land polygons (the offshore test is disabled anyway).
+        cache_path keeps the reference on disk for cache_max_age_s, for a feed that
+        runs every few minutes (the reference itself is rebuilt weekly)."""
         if self.loaded:
             return
-        sys.stderr.write('[deconflict] fetching industrial_sites.min.geojson...\n')
-        fc = _http_json(INDUSTRIAL_SITES_URL)
+        fc = None
+        if cache_path and os.path.exists(cache_path) and time.time() - os.path.getmtime(cache_path) < cache_max_age_s:
+            try:
+                with open(cache_path) as f:
+                    fc = json.load(f)
+                sys.stderr.write(f'[deconflict] reference from cache {cache_path}\n')
+            except (OSError, ValueError):
+                fc = None
+        if fc is None:
+            sys.stderr.write('[deconflict] fetching industrial_sites.min.geojson...\n')
+            fc = _http_json(INDUSTRIAL_SITES_URL)
+            if fc and cache_path and isinstance(fc.get('features'), list):
+                try:
+                    tmp = cache_path + '.tmp'
+                    with open(tmp, 'w') as f:
+                        json.dump(fc, f, separators=(',', ':'))
+                    os.replace(tmp, cache_path)
+                except OSError:
+                    pass
         if not fc or not isinstance(fc.get('features'), list):
             sys.stderr.write('[deconflict] industrial sites unavailable; enrichment disabled\n')
             return
+        self.load_features(fc['features'])
+        if land:
+            self._load_land()
+        self.loaded = True
 
-        feats = fc['features']
+    def load_features(self, feats: list) -> None:
+        """Index a list of GeoJSON Point features (the reference, or a test's)."""
         for f in feats:
             geom = f.get('geometry') or {}
             if geom.get('type') != 'Point':
@@ -129,6 +211,9 @@ class Deconflicter:
         except ImportError:
             sys.stderr.write('[deconflict] sklearn not available — brute-force nearest-neighbor\n')
 
+        self.loaded = True
+
+    def _load_land(self) -> None:
         # Land polygon (offshore test)
         sys.stderr.write('[deconflict] fetching land_10m.geojson...\n')
         land_fc = _http_json(LAND_POLY_URL)
@@ -137,8 +222,6 @@ class Deconflicter:
                 self._walk_geometry(f.get('geometry') or {})
             self.has_land = bool(self._land_polys)
             sys.stderr.write(f'[deconflict] indexed {len(self._land_polys)} land polygons\n')
-
-        self.loaded = True
 
     def _walk_geometry(self, geom: dict) -> None:
         """Recursively unwrap a GeoJSON geometry (Polygon / MultiPolygon /
@@ -168,9 +251,22 @@ class Deconflicter:
         self._land_bboxes.append((min(lats), max(lats), min(lngs), max(lngs)))
         self._land_polys.append(coords)
 
-    def enrich(self, det: dict) -> dict:
-        """Given a detection dict with lat/lng/confidence keys, return a new
-        dict of enrichment fields to merge in. Never mutates the input."""
+    def _candidates(self, lat: float, lng: float) -> list:
+        """The K nearest sources as (index, distance_m), nearest first."""
+        lat_r = math.radians(lat)
+        lng_r = math.radians(lng)
+        k = min(K_CANDIDATES, self.n_sources)
+        if self._tree is not None:
+            import numpy as np
+            dist_rad, idx = self._tree.query(np.array([[lat_r, lng_r]]), k=k)
+            return [(int(i), float(d) * EARTH_RADIUS_M) for d, i in zip(dist_rad[0], idx[0])]
+        ds = sorted((_haversine_rad(lat_r, lng_r, self._lats_rad[i], self._lngs_rad[i]), i) for i in range(self.n_sources))
+        return [(i, d * EARTH_RADIUS_M) for d, i in ds[:k]]
+
+    def _judge(self, det: dict, cands: list) -> dict:
+        """The enrichment fields from the candidate sources (nearest first): the
+        nearest source that covers the detection (see effective_buffer_m) names the
+        flag; with none covering, the nearest source is named and the flag stays."""
         out = {
             'nearest_infra_m':     None,
             'nearest_infra_id':    None,
@@ -178,7 +274,6 @@ class Deconflicter:
             'nearest_infra_name':  None,
             'deconfliction_flag':  'clear',
         }
-
         # Confidence-low is authoritative regardless of proximity — NASA says
         # dropping confidence=low kills ~80% of false positives. We flag but
         # do not drop (life-safety default: never suppress silently).
@@ -191,69 +286,63 @@ class Deconflicter:
         # despite being NASA's own drop-these signal.
         conf_raw = det.get('confidence')
         conf_str = str(conf_raw).strip().lower() if conf_raw is not None else ''
-        is_low = (
-            conf_str in ('l', 'low')
-            or (conf_str.isdigit() and int(conf_str) < 30)   # MODIS numeric: <30 = low
-        )
-        if is_low:
+        if conf_str in ('l', 'low') or (conf_str.isdigit() and int(conf_str) < 30):   # MODIS numeric: <30 = low
             out['deconfliction_flag'] = 'low_confidence'
+        if not cands:
+            return out
+        pick = None
+        for i, dist_m in cands:
+            props = self._props[i]
+            buffer_m = props.get('buffer_m') or _default_buffer(props.get('class'))
+            if dist_m <= effective_buffer_m(buffer_m, det):
+                pick = (i, dist_m)
+                break
+        i, dist_m = pick or cands[0]
+        props = self._props[i]
+        out['nearest_infra_m'] = int(dist_m)
+        out['nearest_infra_id'] = props.get('source_id')
+        out['nearest_infra_class'] = props.get('class')
+        out['nearest_infra_name'] = props.get('name')
+        # confidence-low outranks proximate flags — if it's low-conf AND near an
+        # industrial site, both facts are true but low_confidence is the more
+        # actionable filter (operator picks the button that hides low-conf globally).
+        if pick and out['deconfliction_flag'] == 'clear':
+            out['deconfliction_flag'] = _flag_for_class(props.get('class'))
+        return out
 
+    # v2 — OFFSHORE flagging DISABLED (was: point-in-Natural-Earth-10m-land).
+    # Rationale: Natural Earth 10m is a 1:10M-scale generalized coastline.
+    # VIIRS 375m native pixel + ~125m FIRMS geolocation error means a
+    # LEGITIMATE coastal wildfire commonly plots outside the simplified
+    # polygon — a false-positive-false-positive. Operator screenshot
+    # 2026-07-02 showed CONUS-wide offshore mis-flagging (St. Louis,
+    # Chicago, Nashville, Birmingham all tagged offshore).
+    #
+    # The right fix is a distance-INTO-water threshold (require ≥2km
+    # from any land polygon before flagging), but that needs a proper
+    # spatial index against the polygon boundary distance which we
+    # haven't built. Until then: keep the industrial / volcano /
+    # nuclear / low_confidence flags (accurate + operator-actionable)
+    # and skip offshore entirely.
+    #
+    # NOTE: has_land / _walk_geometry / _is_on_land are still loaded
+    # so we can re-enable in v2 with the distance-threshold fix. No
+    # code deletion — just don't emit the flag.
+
+    def enrich(self, det: dict) -> dict:
+        """Given a detection dict with lat/lng/confidence keys (and, when known,
+        scan/track in km and sensor), return a new dict of enrichment fields to
+        merge in. Never mutates the input."""
         lat = det.get('lat')
         lng = det.get('lng')
-        if lat is None or lng is None:
-            return out
-
-        # Nearest source (only if we have any indexed at all)
-        if self.loaded and self.n_sources > 0:
-            nearest_i, dist_m = self._nearest(lat, lng)
-            if nearest_i is not None:
-                props = self._props[nearest_i]
-                out['nearest_infra_m']    = int(dist_m)
-                out['nearest_infra_id']   = props.get('source_id')
-                out['nearest_infra_class'] = props.get('class')
-                out['nearest_infra_name'] = props.get('name')
-                buffer_m = props.get('buffer_m') or _default_buffer(props.get('class'))
-                if dist_m <= buffer_m:
-                    # confidence-low outranks proximate flags — if it's low-conf
-                    # AND near an industrial site, both facts are true but
-                    # low_confidence is the more actionable filter (operator
-                    # picks the buttion that hides low-conf globally).
-                    if out['deconfliction_flag'] == 'clear':
-                        cls = props.get('class')
-                        if cls == 'volcano':
-                            out['deconfliction_flag'] = 'proximate_volcano'
-                        elif cls == 'industrial':
-                            out['deconfliction_flag'] = 'proximate_industrial'
-                        elif cls == 'solar':                 # forward-compat for v2
-                            out['deconfliction_flag'] = 'proximate_solar'
-                        else:
-                            out['deconfliction_flag'] = 'proximate_' + str(cls)
-
-        # v2 — OFFSHORE flagging DISABLED (was: point-in-Natural-Earth-10m-land).
-        # Rationale: Natural Earth 10m is a 1:10M-scale generalized coastline.
-        # VIIRS 375m native pixel + ~125m FIRMS geolocation error means a
-        # LEGITIMATE coastal wildfire commonly plots outside the simplified
-        # polygon — a false-positive-false-positive. Operator screenshot
-        # 2026-07-02 showed CONUS-wide offshore mis-flagging (St. Louis,
-        # Chicago, Nashville, Birmingham all tagged offshore).
-        #
-        # The right fix is a distance-INTO-water threshold (require ≥2km
-        # from any land polygon before flagging), but that needs a proper
-        # spatial index against the polygon boundary distance which we
-        # haven't built. Until then: keep the industrial / volcano /
-        # nuclear / low_confidence flags (accurate + operator-actionable)
-        # and skip offshore entirely.
-        #
-        # NOTE: has_land / _walk_geometry / _is_on_land are still loaded
-        # so we can re-enable in v2 with the distance-threshold fix. No
-        # code deletion — just don't emit the flag.
-
-        return out
+        if lat is None or lng is None or not (self.loaded and self.n_sources > 0):
+            return self._judge(det, [])
+        return self._judge(det, self._candidates(lat, lng))
 
     def enrich_many(self, dets: list) -> None:
         """Batched enrich() for the global feed (~300k detections per cycle).
-        Same rules as enrich(), but one vectorised BallTree query instead of one
-        numpy round-trip per detection (~30 s -> ~2 s). Updates dets in place.
+        Same rules as enrich(), but one vectorised BallTree query (K nearest)
+        instead of one numpy round-trip per detection. Updates dets in place.
         Falls back to per-row enrich() if numpy/sklearn are missing."""
         if not dets:
             return
@@ -263,54 +352,16 @@ class Deconflicter:
             return
         import numpy as np
         pts = np.radians(np.array([[d['lat'], d['lng']] for d in dets], dtype=float))
-        dist_rad, idx = self._tree.query(pts, k=1)
-        for d, dr, ix in zip(dets, dist_rad[:, 0], idx[:, 0]):
-            out = {'nearest_infra_m': None, 'nearest_infra_id': None, 'nearest_infra_class': None,
-                   'nearest_infra_name': None, 'deconfliction_flag': 'clear'}
-            conf_raw = d.get('confidence')
-            conf_str = str(conf_raw).strip().lower() if conf_raw is not None else ''
-            if conf_str in ('l', 'low') or (conf_str.isdigit() and int(conf_str) < 30):
-                out['deconfliction_flag'] = 'low_confidence'
-            props = self._props[int(ix)]
-            dist_m = float(dr) * EARTH_RADIUS_M
-            out['nearest_infra_m'] = int(dist_m)
-            out['nearest_infra_id'] = props.get('source_id')
-            out['nearest_infra_class'] = props.get('class')
-            out['nearest_infra_name'] = props.get('name')
-            buffer_m = props.get('buffer_m') or _default_buffer(props.get('class'))
-            if dist_m <= buffer_m and out['deconfliction_flag'] == 'clear':
-                cls = props.get('class')
-                if cls == 'volcano':
-                    out['deconfliction_flag'] = 'proximate_volcano'
-                elif cls == 'industrial':
-                    out['deconfliction_flag'] = 'proximate_industrial'
-                elif cls == 'solar':
-                    out['deconfliction_flag'] = 'proximate_solar'
-                else:
-                    out['deconfliction_flag'] = 'proximate_' + str(cls)
-            d.update(out)
+        k = min(K_CANDIDATES, self.n_sources)
+        dist_rad, idx = self._tree.query(pts, k=k)
+        for n, d in enumerate(dets):
+            cands = [(int(i), float(dr) * EARTH_RADIUS_M) for dr, i in zip(dist_rad[n], idx[n])]
+            d.update(self._judge(d, cands))
 
     def _nearest(self, lat: float, lng: float) -> tuple[Optional[int], float]:
         """Return (index, distance_m) of the closest source."""
-        lat_r = math.radians(lat)
-        lng_r = math.radians(lng)
-        if self._tree is not None:
-            import numpy as np
-            dist_rad, idx = self._tree.query(np.array([[lat_r, lng_r]]), k=1)
-            i = int(idx[0][0])
-            d = float(dist_rad[0][0]) * EARTH_RADIUS_M
-            return i, d
-        # Brute force fallback
-        best_i = -1
-        best_d = float('inf')
-        for i in range(self.n_sources):
-            d = _haversine_rad(lat_r, lng_r, self._lats_rad[i], self._lngs_rad[i])
-            if d < best_d:
-                best_d = d
-                best_i = i
-        if best_i < 0:
-            return None, float('inf')
-        return best_i, best_d * EARTH_RADIUS_M
+        c = self._candidates(lat, lng) if self.n_sources else []
+        return c[0] if c else (None, float('inf'))
 
     def _is_on_land(self, lat: float, lng: float) -> bool:
         """Return True if (lat, lng) is inside any land polygon."""

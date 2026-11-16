@@ -21,7 +21,7 @@ FEEDS = {
     # ── near-real-time (fast lane) ──────────────────────────────────────
     'lightning': {'code': ['lightning'], 'run': [['python', 'fetch_glm.py']],
                   'every': 60, 'timeout': 240},
-    'goes-fire': {'code': ['goes_fire'], 'run': [['python', 'fetch_fdc.py']],
+    'goes-fire': {'code': ['goes_fire', 'firms'], 'run': [['python', 'fetch_fdc.py']],   # firms: deconflict.py (2026-11-16)
                   'every': 120, 'timeout': 300},
     'ngfs':      {'code': ['ngfs'], 'run': [['python', 'fetch_ngfs.py']],
                   'every': 120, 'timeout': 300, 'backoff': 1800},   # SSEC's host has returned 503 since 2026-10-21
@@ -62,6 +62,7 @@ FEEDS = {
                    'run': [['python', 'fetch_epa_frs.py'], ['python', 'fetch_gvp.py'],
                            ['python', 'fetch_gibs_nuclear.py'], ['python', 'self_mine_persistent.py'],
                            ['python', 'fetch_global_industrial.py'], ['python', 'fetch_ne_land.py'],
+                           ['python', 'fetch_nasa_static.py'],   # 2026-11-16: NASA type-2 static sources, prior year (kept once staged)
                            ['python', 'build_industrial_sites.py']],
                    'ignore': ['_cache_*', '_ne_ogr_tmp.geojson', '*.tmp']},
 }

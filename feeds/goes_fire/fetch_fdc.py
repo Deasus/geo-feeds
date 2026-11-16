@@ -43,7 +43,17 @@ SOURCE (public, anonymous, no auth, no egress charge — same NODD program as GL
   s3://noaa-goes18/ABI-L2-FDCC/<YYYY>/<DDD>/<HH>/*.nc   (West/CONUS)
   FDCC = CONUS sector (~5 min). (FDCF = full disk ~10 min; FDCM = mesoscale.)
 
-Requires: boto3, botocore, netCDF4, numpy. No API key.
+KNOWN SOURCES (2026-11-16): every published cell carries the deconfliction flag the
+FIRMS feed gives polar detections (deconflict.py against the industrial-sites
+reference: plants, flares, landfills, volcanoes, NASA static land sources,
+persistent hotspots), with the reach widened by THIS pixel's footprint: a GOES pixel
+over the western US is ~2.5 x 3.5 km, so a source anywhere in it explains the heat.
+  pix_km = [east-west, north-south] ground size of the pixel (fixed grid, PUG vol 3)
+  deconfliction_flag = clear | proximate_<class>; nearest_infra_name / _m / _class when flagged
+Flagged cells are NOT dropped (life-safety default, as in the FIRMS feed): clients
+decide. counts.by_flag and deconfliction{} say what the reference held.
+
+Requires: boto3, botocore, netCDF4, numpy (scikit-learn for the reference index). No API key.
 """
 from __future__ import annotations
 import io
@@ -57,6 +67,15 @@ from botocore import UNSIGNED
 from botocore.config import Config
 import netCDF4
 import numpy as np
+
+try:   # the conductor copies feeds/firms/*.py beside this file; a local run reads it in place
+    from deconflict import Deconflicter
+except ImportError:  # pragma: no cover
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'firms'))
+    try:
+        from deconflict import Deconflicter
+    except ImportError:
+        Deconflicter = None
 
 # ── Config ───────────────────────────────────────────────────────────
 # ROLLING WINDOW (2026-10-05). This used to publish only the SINGLE newest granule per
@@ -72,6 +91,14 @@ LOOKBACK_HOURS = 2          # search this many hours back for the window's granu
 SATS = [("noaa-goes19", "G19", "g19"), ("noaa-goes18", "G18", "g18")]
 PRODUCT_PREFIX = "ABI-L2-FDCC"     # CONUS sector
 OUT_PATH = os.environ.get("FDC_OUT_PATH") or os.path.join(os.path.dirname(__file__), "data", "goes_fire.json")
+# The reference, kept beside the code (not in data/) for 6 h: this feed runs every 2 min and the
+# reference is rebuilt weekly.
+REF_CACHE = os.environ.get("FDC_REF_CACHE", "_industrial_cache.json")
+# GOES-R fixed grid, 2 km bands (FDC): the scan-angle step in radians (PUG vol 3, 56 µrad)
+FDC_STEP_RAD = 56e-6
+# GRS80 and the GOES-R perspective height, as the FDC files carry them in goes_imager_projection
+R_EQ, R_POL, H_PERSP = 6378137.0, 6356752.31414, 35786023.0
+SUB_LON = {"G18": -137.0, "G19": -75.0}   # longitude_of_projection_origin of each satellite's files
 
 # GOES FDC Mask flag_values → a coarse confidence tier we surface to the
 # frontend. (Full meanings verified from the live granule's flag_meanings attr.)
@@ -168,6 +195,89 @@ def _geo_latlon(proj, x_rad: np.ndarray, y_rad: np.ndarray):
     return lat, lon, good
 
 
+class _Proj:
+    """The projection constants of goes_imager_projection, for a satellite with no granule open."""
+    def __init__(self, lon0):
+        self.perspective_point_height = H_PERSP
+        self.semi_major_axis = R_EQ
+        self.semi_minor_axis = R_POL
+        self.longitude_of_projection_origin = lon0
+
+
+def _scan_angles(proj, lat_deg, lon_deg):
+    """Geodetic lat/lon → GOES-R fixed-grid scan angles (x, y) in radians (PUG vol 3, the inverse)."""
+    req, rpol = proj.semi_major_axis, proj.semi_minor_axis
+    H = proj.perspective_point_height + req
+    e2 = (req ** 2 - rpol ** 2) / req ** 2
+    lat = np.radians(lat_deg)
+    dlon = np.radians(lon_deg) - np.radians(proj.longitude_of_projection_origin)
+    phic = np.arctan((rpol ** 2 / req ** 2) * np.tan(lat))
+    rc = rpol / np.sqrt(1 - e2 * np.cos(phic) ** 2)
+    sx = H - rc * np.cos(phic) * np.cos(dlon)
+    sy = -rc * np.cos(phic) * np.sin(dlon)
+    sz = rc * np.sin(phic)
+    return np.arcsin(-sy / np.sqrt(sx ** 2 + sy ** 2 + sz ** 2)), np.arctan(sz / sx)
+
+
+def _gc_km(lat1, lon1, lat2, lon2):
+    p1, p2 = np.radians(lat1), np.radians(lat2)
+    a = np.sin((p2 - p1) / 2) ** 2 + np.cos(p1) * np.cos(p2) * np.sin(np.radians(lon2 - lon1) / 2) ** 2
+    return 2 * 6371.0088 * np.arcsin(np.minimum(1, np.sqrt(a)))
+
+
+def pixel_km(proj, x_rad, y_rad, step=FDC_STEP_RAD):
+    """Ground size (km) of the pixels centred at scan angles (x, y): east-west across x ± step/2,
+    north-south across y ± step/2. Arrays in, arrays out."""
+    x_rad, y_rad = np.asarray(x_rad, dtype=float), np.asarray(y_rad, dtype=float)
+    la0, lo0, _ = _geo_latlon(proj, x_rad - step / 2, y_rad)
+    la1, lo1, _ = _geo_latlon(proj, x_rad + step / 2, y_rad)
+    la2, lo2, _ = _geo_latlon(proj, x_rad, y_rad - step / 2)
+    la3, lo3, _ = _geo_latlon(proj, x_rad, y_rad + step / 2)
+    return _gc_km(la0, lo0, la1, lo1), _gc_km(la2, lo2, la3, lo3)
+
+
+def pixel_km_at(sat_label, lat, lon):
+    """The FDC pixel footprint at a published lat/lon (for a record decoded before pix_km existed)."""
+    proj = _Proj(SUB_LON.get(sat_label, -137.0))
+    x, y = _scan_angles(proj, lat, lon)
+    ew, ns = pixel_km(proj, x, y)
+    return float(ew), float(ns)
+
+
+def deconflict_cells(detections):
+    """Give each published cell the FIRMS feed's deconfliction flag, its reach widened by the
+    cell's own pixel footprint (deconflict.effective_buffer_m). Never drops a cell; never raises."""
+    meta = {"reference_loaded": False, "n_sources": 0, "by_flag": {},
+            "rule": "source buffer_m + half the pixel diagonal (pix_km) + 100 m location error"}
+    for d in detections:
+        d["deconfliction_flag"] = "clear"
+    if Deconflicter is None or not detections:
+        meta["by_flag"] = {"clear": len(detections)} if detections else {}
+        return meta
+    try:
+        dc = Deconflicter()
+        dc.load(land=False, cache_path=REF_CACHE)
+        meta["reference_loaded"], meta["n_sources"] = dc.loaded, dc.n_sources
+        rows = []
+        for d in detections:
+            pk = d.get("pix_km") or [2.0, 2.0]
+            rows.append({"lat": d["lat"], "lng": d["lng"], "confidence": None, "sensor": "ABI", "scan": pk[0], "track": pk[1]})
+        if dc.loaded:
+            dc.enrich_many(rows)
+        for d, r in zip(detections, rows):
+            flag = r.get("deconfliction_flag") or "clear"
+            d["deconfliction_flag"] = flag
+            if flag != "clear":
+                d["nearest_infra_name"] = r.get("nearest_infra_name")
+                d["nearest_infra_m"] = r.get("nearest_infra_m")
+                d["nearest_infra_class"] = r.get("nearest_infra_class")
+    except Exception as e:  # the fire layer must publish whatever the reference does
+        print(f"[deconflict] GOES enrichment failed: {e}", file=sys.stderr)
+    for d in detections:
+        meta["by_flag"][d["deconfliction_flag"]] = meta["by_flag"].get(d["deconfliction_flag"], 0) + 1
+    return meta
+
+
 def _decode(raw: bytes, sat_label: str, now: datetime):
     ds = netCDF4.Dataset("inmem", memory=raw)
     try:
@@ -189,6 +299,8 @@ def _decode(raw: bytes, sat_label: str, now: datetime):
         xr = np.asarray(x)[fx]
         yr = np.asarray(y)[fy]
         lat, lon, good = _geo_latlon(proj, xr, yr)
+        step = float(abs(np.asarray(x)[1] - np.asarray(x)[0])) if np.asarray(x).size > 1 else FDC_STEP_RAD
+        ew, ns = pixel_km(proj, xr, yr, step)
         out = []
         for n in range(fy.size):
             if not good[n]:
@@ -203,6 +315,7 @@ def _decode(raw: bytes, sat_label: str, now: datetime):
                 "tier": tier,
                 "sat": sat_label,
                 "age_sec": age,
+                "pix_km": [round(float(ew[n]), 2), round(float(ns[n]), 2)] if np.isfinite(ew[n]) and np.isfinite(ns[n]) else None,
             }
             pv = power[j, i]
             if pv is not np.ma.masked and float(pv) >= 0:
@@ -246,7 +359,7 @@ def main() -> int:
                     c["first_seen_sec"] = max(c["first_seen_sec"], d["age_sec"])
                     last = min(c["age_sec"], d["age_sec"])
                     if d.get("frp", 0) > c.get("frp", 0):      # show the strongest sighting
-                        for f in ("lat", "lng", "frp", "tempK", "tier", "sat"):
+                        for f in ("lat", "lng", "frp", "tempK", "tier", "sat", "pix_km"):
                             if f in d:
                                 c[f] = d[f]
                             else:
@@ -262,7 +375,13 @@ def main() -> int:
     detections = []
     for c in sorted(cells.values(), key=lambda r: -(r.get("frp", 0))):
         c["scans"] = len(c.pop("_scans"))
+        if not c.get("pix_km"):   # a granule decoded (and cached) before pix_km existed
+            try:
+                c["pix_km"] = [round(v, 2) for v in pixel_km_at(c.get("sat"), c["lat"], c["lng"])]
+            except Exception:
+                c["pix_km"] = None
         detections.append(c)
+    dmeta = deconflict_cells(detections)
     window_min = (round((newest_gen - oldest_gen).total_seconds() / 60) + 5) if newest_gen else 0
 
     payload = {
@@ -272,7 +391,8 @@ def main() -> int:
         "window_minutes": window_min,
         "window_scans": WINDOW_SCANS,
         "product": "GOES-R ABI L2 FDC (Fire/Hot Spot Characterization), CONUS sector, 2km",
-        "counts": {"total": len(detections), **counts},
+        "counts": {"total": len(detections), **counts, "by_flag": dmeta["by_flag"]},
+        "deconfliction": {k: dmeta[k] for k in ("reference_loaded", "n_sources", "rule")},
         "detections": detections,
     }
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)

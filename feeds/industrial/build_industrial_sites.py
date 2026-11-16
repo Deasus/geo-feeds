@@ -2,9 +2,10 @@
 """Merge the three staged source JSONs into a single industrial_sites.geojson
 that firms feed consumes at ingest time.
 
-Inputs (produced by the three fetch_*.py scripts):
+Inputs (produced by the fetch_*.py scripts):
   data/_stage_epa_frs.json     — EPA FRS thermal-emitter facilities
   data/_stage_gvp.json         — Smithsonian GVP Holocene volcanoes
+  data/_stage_nasa_static.json — NASA type-2 static land sources, prior year (2026-11-16)
 
 Output:
   data/industrial_sites.geojson       — merged FeatureCollection of Points
@@ -26,26 +27,33 @@ STAGE_GVP   = os.path.join('data', '_stage_gvp.json')
 STAGE_GIBS  = os.path.join('data', '_stage_gibs_nuclear.json')       # Path B
 STAGE_FIRMS = os.path.join('data', '_stage_firms_persistent.json')   # Path A
 STAGE_GLOBAL = os.path.join('data', '_stage_global_industrial.json')  # 2026-10-16: WRI GPPD + OSM, outside the US
+STAGE_NASA  = os.path.join('data', '_stage_nasa_static.json')        # 2026-11-16: NASA type-2 static land sources (prior year)
 LAND_POLY   = os.path.join('data', 'land_10m.geojson')   # existence check only
 
 OUT_GEOJSON = os.path.join('data', 'industrial_sites.geojson')
 OUT_MIN     = os.path.join('data', 'industrial_sites.min.geojson')
 OUT_META    = os.path.join('data', 'industrial_sites_meta.json')
 
-# Per-class default proximity buffer for VIIRS/MODIS deconfliction.
-# Empirical basis: VIIRS 375m native pixel + ~125m FIRMS geolocation error
-# = 500m defensive floor for industrial point sources. Volcanoes get 5km
-# to cover flank vents. Solar farms (v2) will be 375m because USPVDB
-# publishes tight polygon footprints — no summit offset to worry about.
+# Per-class buffer_m: the SOURCE's own extent around its point (2026-11-16). The detection's
+# pixel and location error are added per detection when it is tested
+# (feeds/firms/deconflict.effective_buffer_m: buffer_m + half the pixel diagonal + 100 m),
+# so a MODIS pixel at the scan edge or a GOES pixel reaches farther than a VIIRS pixel at
+# nadir. Before 2026-11-16 buffer_m was the whole test (500 m, sized for VIIRS at nadir).
+#   industrial / nuclear  500 m  a registered facility point (EPA FRS, WRI GPPD, OSM, SEDAC):
+#                                the plant, flare stack or landfill within ~500 m of it
+#   volcano              5000 m  flank vents
+#   persistent_other      550 m  a 0.004° self-mined cell (half-diagonal ~280 m) whose detection
+#   industrial_firms      550 m  centres sit up to half a VIIRS pixel (265 m) from the source; the
+#                                NASA static cells are 400 m (half-diagonal 283 m) → 283 + 265 ≈ 550
 DEFAULT_BUFFER_M = {
     'industrial': 500,
     'volcano':    5000,
     'nuclear':    500,   # Path B: NASA GIBS SEDAC nuclear plants — reactor complex bounded ~500m
-    # Path A: self-mined persistent thermal sources (replaces the earlier
-    # VNP14IMGML approach). 500m matches VIIRS 375m native pixel + 125m
-    # geolocation error. Cluster centroid is already at 0.004° (~440m) grid
-    # resolution so we're tight.
-    'persistent_other': 500,
+    # Path A: self-mined persistent thermal sources (replaces the earlier VNP14IMGML approach)
+    'persistent_other': 550,
+    # 2026-11-16: NASA's own type-2 "other static land source" detections of the previous year
+    # (fetch_nasa_static.py); the flag is proximate_industrial_firms, which the client already names
+    'industrial_firms': 550,
 }
 
 
@@ -77,7 +85,8 @@ def main() -> int:
     gibs   = _load(STAGE_GIBS)     # Path B: nuclear plants
     firms  = _load(STAGE_FIRMS)    # Path A: NASA's own persistent-source clustering
     glob   = _load(STAGE_GLOBAL)   # 2026-10-16: global industrial heat (power plants, flares, refineries, steel, cement)
-    if not frs and not gvp and not gibs and not firms and not glob and not os.path.exists(OUT_GEOJSON):
+    nasa   = _load(STAGE_NASA)     # 2026-11-16: NASA type-2 static land sources, prior calendar year
+    if not frs and not gvp and not gibs and not firms and not glob and not nasa and not os.path.exists(OUT_GEOJSON):
         sys.exit('[merge] FATAL: no source stages and no previous output; nothing to merge')
 
     features: list[dict] = []
@@ -211,12 +220,33 @@ def main() -> int:
         })
         sys.stderr.write(f'[merge] +{len(features) - n_before} global industrial heat sources\n')
 
+    # ---- 2026-11-16: NASA's own static land sources (FIRMS standard archive, type 2) ----
+    if nasa:
+        n_before = len(features)
+        yr = nasa.get('year')
+        for i, c in enumerate(nasa.get('sources', [])):
+            features.append(_feat(c['lat'], c['lng'], {
+                'source_id':   f'nasa_static:{yr}:{i}',
+                'source_type': 'static_land_source',
+                'class':       'industrial_firms',
+                'name':        f'NASA STATIC LAND SOURCE ({c.get("n", 0)} type-2 dets, {yr})',
+                'n_detections': c.get('n'),
+                'first_seen':  c.get('first'),
+                'last_seen':   c.get('last'),
+                'buffer_m':    DEFAULT_BUFFER_M['industrial_firms'],
+                'provenance':  f'NASA FIRMS {yr} standard archive, type 2 (other static land source); '
+                               f'{int(nasa.get("grid_m", 400))} m grid, >= {nasa.get("min_detections", 5)} detections in the year',
+            }))
+        source_summary.append({'source': 'nasa_static', 'generated': nasa.get('generated_utc'), 'year': yr,
+                               'countries': nasa.get('countries'), 'count': len(features) - n_before, 'method': nasa.get('method')})
+        sys.stderr.write(f'[merge] +{len(features) - n_before} NASA static land sources ({yr})\n')
+
     # ---- Carry forward any source whose stage is missing this run ----
     # A failed fetch (upstream outage, a WAF challenge) leaves no stage file. Rather
     # than silently dropping that whole layer from the reference, keep its features
     # from the previous merged output so deconfliction never regresses.
     missing = {'epa_frs': frs, 'gvp': gvp, 'gibs_npp': gibs, 'firms_self_mined': firms,
-               'wri_gppd': glob, 'osm': glob}
+               'wri_gppd': glob, 'osm': glob, 'nasa_static': nasa}
     missing = {prefix for prefix, stage in missing.items() if not stage}
     if missing:
         prev = _load(OUT_GEOJSON) or {}
