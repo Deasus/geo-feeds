@@ -221,8 +221,12 @@ def fetch_source(source: str) -> list[dict]:
             'track': r.get('track') or None,
         }
         rows.append(det)
-    # v2_deconflict-mvp enrichment, batched (2026-10-16): one BallTree query for the
-    # whole global source instead of one per row. Never raises.
+    return _enrich_and_slim(rows)
+
+
+def _enrich_and_slim(rows: list) -> list:
+    """The deconfliction flag for every row (batched: one BallTree query for the whole global source; never raises),
+    then the pixel footprint (scan/track, used only by the known-source test) dropped so the published rows are unchanged."""
     try:
         _get_deconflicter().enrich_many(rows)
     except Exception as _e:

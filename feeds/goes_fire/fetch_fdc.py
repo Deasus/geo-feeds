@@ -51,7 +51,7 @@ over the western US is ~2.5 x 3.5 km, so a source anywhere in it explains the he
   pix_km = [east-west, north-south] ground size of the pixel (fixed grid, PUG vol 3)
   deconfliction_flag = clear | proximate_<class>; nearest_infra_name / _m / _class when flagged
 Flagged cells are NOT dropped (life-safety default, as in the FIRMS feed): clients
-decide. counts.by_flag and deconfliction{} say what the reference held.
+decide. deconfliction{} says what the reference held and how many cells each flag got (by_flag).
 
 Requires: boto3, botocore, netCDF4, numpy (scikit-learn for the reference index). No API key.
 """
@@ -391,8 +391,8 @@ def main() -> int:
         "window_minutes": window_min,
         "window_scans": WINDOW_SCANS,
         "product": "GOES-R ABI L2 FDC (Fire/Hot Spot Characterization), CONUS sector, 2km",
-        "counts": {"total": len(detections), **counts, "by_flag": dmeta["by_flag"]},
-        "deconfliction": {k: dmeta[k] for k in ("reference_loaded", "n_sources", "rule")},
+        "counts": {"total": len(detections), **counts},   # all integers, as before 2026-11-16 (review P4)
+        "deconfliction": {k: dmeta[k] for k in ("reference_loaded", "n_sources", "rule", "by_flag")},
         "detections": detections,
     }
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)

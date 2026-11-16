@@ -140,6 +140,7 @@ class Deconflicter:
         # legacy_reach (2026-11-16 review): the pre-2026-11-16 test — the NEAREST source only, distance <= buffer_m — for callers
         # that pass no pixel size (the geostationary feeds via _shared/geo_common.py, which add their own pixel-scale floor)
         self.legacy_reach = legacy_reach
+        self.stale_cache = False   # True when load() fell back to an expired cache because the refetch failed
         self.loaded = False
         self.has_land = False
         self.n_sources = 0
@@ -168,6 +169,17 @@ class Deconflicter:
         if fc is None:
             sys.stderr.write('[deconflict] fetching industrial_sites.min.geojson...\n')
             fc = _http_json(INDUSTRIAL_SITES_URL)
+            if not (fc and isinstance(fc.get('features'), list)) and cache_path and os.path.exists(cache_path):
+                # review P4: the refetch failed — a stale copy of a weekly reference beats no reference at all
+                try:
+                    with open(cache_path) as f:
+                        fc = json.load(f)
+                    age_h = (time.time() - os.path.getmtime(cache_path)) / 3600
+                    sys.stderr.write(f'[deconflict] refetch failed; using the cached reference ({age_h:.1f} h old)\n')
+                    self.stale_cache = True
+                    return self._finish(fc, land)
+                except (OSError, ValueError):
+                    fc = None
             if fc and cache_path and isinstance(fc.get('features'), list):
                 try:
                     tmp = cache_path + '.tmp'
@@ -176,6 +188,9 @@ class Deconflicter:
                     os.replace(tmp, cache_path)
                 except OSError:
                     pass
+        self._finish(fc, land)
+
+    def _finish(self, fc, land: bool) -> None:
         if not fc or not isinstance(fc.get('features'), list):
             sys.stderr.write('[deconflict] industrial sites unavailable; enrichment disabled\n')
             return
