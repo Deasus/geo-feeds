@@ -1,0 +1,66 @@
+{
+  "generated_utc": "2026-11-17T17:10:24.705158Z",
+  "total_features": 26892,
+  "sources": [
+    {
+      "source": "epa_frs",
+      "generated": "2026-11-17T16:30:27.043359Z",
+      "count": 9807,
+      "naics_used": [
+        "324110",
+        "221112",
+        "331110",
+        "327310",
+        "562213"
+      ]
+    },
+    {
+      "source": "gvp_holocene",
+      "generated": "2026-11-17T16:30:29.325212Z",
+      "count": 1214
+    },
+    {
+      "source": "gibs_nuclear",
+      "generated": "2026-11-17T16:30:29.932381Z",
+      "count": 235
+    },
+    {
+      "source": "firms_self_mined_persistent",
+      "generated": "2026-11-17T16:30:30.007557Z",
+      "count": 1591,
+      "lookback_days": 90,
+      "sampled_commits": 30,
+      "algorithm": "0.0040\u00b0 grid quantization + \u22656 distinct-day threshold"
+    },
+    {
+      "source": "global_industrial",
+      "generated": "2026-11-17T16:30:39.590219Z",
+      "count": 14045,
+      "detail": {
+        "wri_gppd": {
+          "status": "fresh",
+          "count": 7480,
+          "generated_utc": "2026-11-17T16:30:39.590219Z"
+        },
+        "osm": {
+          "status": "carried_forward",
+          "count": 6565,
+          "error": "Overpass unavailable after retries: HTTP Error 502: Bad Gateway",
+          "generated_utc": "2026-11-03T16:30:40.749800Z"
+        }
+      }
+    },
+    {
+      "source": "natural_earth_land_10m",
+      "file": "data/land_10m.geojson",
+      "available": true
+    }
+  ],
+  "consumer": "firms feed/fetch_firms.py",
+  "buffer_defaults": {
+    "industrial": 500,
+    "volcano": 5000,
+    "nuclear": 500,
+    "persistent_other": 500
+  }
+}
