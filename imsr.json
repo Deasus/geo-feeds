@@ -1,0 +1,863 @@
+{
+  "summary": {
+    "report_date_human": "Friday November 20, 2026",
+    "report_time": "0730 MDT",
+    "national_preparedness_level": 1,
+    "initial_attack_activity": "Light (46 fires)",
+    "new_large_incidents": 1,
+    "large_fires_contained": 3,
+    "uncontained_large_fires": 3,
+    "cimts_committed": 0,
+    "nimos_committed": 0
+  },
+  "resource_summary": [
+    {
+      "gacc": "AICC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "NWCC",
+      "pl": 1,
+      "incidents": 1,
+      "cumulative_acres": 9575,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 1,
+      "change_in_personnel": -32
+    },
+    {
+      "gacc": "ONCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "OSCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "NRCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "GBCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "SWCC",
+      "pl": 1,
+      "incidents": 0,
+      "cumulative_acres": 0,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 0,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "RMCC",
+      "pl": 2,
+      "incidents": 1,
+      "cumulative_acres": 102007,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 0,
+      "total_personnel": 1,
+      "change_in_personnel": 1
+    },
+    {
+      "gacc": "EACC",
+      "pl": 1,
+      "incidents": 2,
+      "cumulative_acres": 1068,
+      "crews": 0,
+      "engines": 0,
+      "helicopters": 1,
+      "total_personnel": 57,
+      "change_in_personnel": 0
+    },
+    {
+      "gacc": "SACC",
+      "pl": 2,
+      "incidents": 9,
+      "cumulative_acres": 10977,
+      "crews": 0,
+      "engines": 22,
+      "helicopters": 1,
+      "total_personnel": 111,
+      "change_in_personnel": 4
+    },
+    {
+      "gacc": "Total",
+      "pl": null,
+      "incidents": 13,
+      "cumulative_acres": 123627,
+      "crews": 0,
+      "engines": 22,
+      "helicopters": 2,
+      "total_personnel": 170,
+      "change_in_personnel": -27
+    }
+  ],
+  "gacc_sections": [
+    {
+      "gacc": "SACC",
+      "area": "Southern Area",
+      "preparedness_level": 2,
+      "new_fires": 32,
+      "new_large_incidents": 1,
+      "uncontained_large_fires": 1,
+      "narrative": "Bee Haven 2 24-06, Florida Forest Service. Twenty-eight miles northwest of Lake City, FL. Southern rough. Minimal fire behavior with smoldering.",
+      "large_fires": [
+        {
+          "name": "Bee Haven 2 24-06",
+          "unit": "FL-FLS",
+          "acres": 2060,
+          "acres_change": 0,
+          "pct": 85,
+          "ctn_or_comp": "Ctn",
+          "est_date": "12/25",
+          "personnel": 41,
+          "personnel_change": 0,
+          "crews": 0,
+          "engines": 5,
+          "helicopters": 1,
+          "structures_lost": 0,
+          "cost_to_date_usd": null,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "East Air",
+          "unit": "MS-MNF",
+          "acres": 305,
+          "acres_change": null,
+          "pct": 100,
+          "ctn_or_comp": "Ctn",
+          "est_date": null,
+          "personnel": 9,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 2,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 40000,
+          "origin_owner": "FS",
+          "is_new": true
+        },
+        {
+          "name": "Range 47",
+          "unit": "MS-MNF",
+          "acres": 2379,
+          "acres_change": 0,
+          "pct": 100,
+          "ctn_or_comp": "Ctn",
+          "est_date": null,
+          "personnel": 18,
+          "personnel_change": 0,
+          "crews": 0,
+          "engines": 4,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 90000,
+          "origin_owner": "FS",
+          "is_new": false
+        },
+        {
+          "name": "201W",
+          "unit": "MS-MNF",
+          "acres": 2700,
+          "acres_change": 0,
+          "pct": 100,
+          "ctn_or_comp": "Ctn",
+          "est_date": null,
+          "personnel": 17,
+          "personnel_change": 0,
+          "crews": 0,
+          "engines": 4,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 75000,
+          "origin_owner": "FS",
+          "is_new": false
+        }
+      ]
+    },
+    {
+      "gacc": "EACC",
+      "area": "Eastern Area",
+      "preparedness_level": 1,
+      "new_fires": 7,
+      "new_large_incidents": 0,
+      "uncontained_large_fires": 2,
+      "narrative": "Kessel, West Virginia DOF. Seven miles southwest of Berkeley Springs, WV. Hardwood litter. No new information. Last narrative report unless new information is received.",
+      "large_fires": [
+        {
+          "name": "Kessel",
+          "unit": "WV-WVS",
+          "acres": 360,
+          "acres_change": null,
+          "pct": 80,
+          "ctn_or_comp": "Ctn",
+          "est_date": "UNK",
+          "personnel": 0,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 0,
+          "helicopters": 0,
+          "structures_lost": 0,
+          "cost_to_date_usd": 7000,
+          "origin_owner": "ST",
+          "is_new": false
+        },
+        {
+          "name": "Wild River",
+          "unit": "NH-WMF",
+          "acres": 817,
+          "acres_change": null,
+          "pct": 59,
+          "ctn_or_comp": "Ctn",
+          "est_date": "12/1",
+          "personnel": 56,
+          "personnel_change": null,
+          "crews": 0,
+          "engines": 0,
+          "helicopters": 1,
+          "structures_lost": 0,
+          "cost_to_date_usd": 1600000,
+          "origin_owner": "FS",
+          "is_new": false
+        }
+      ]
+    }
+  ],
+  "large_fires_by_gacc": {
+    "SACC": [
+      {
+        "name": "Bee Haven 2 24-06",
+        "unit": "FL-FLS",
+        "acres": 2060,
+        "acres_change": 0,
+        "pct": 85,
+        "ctn_or_comp": "Ctn",
+        "est_date": "12/25",
+        "personnel": 41,
+        "personnel_change": 0,
+        "crews": 0,
+        "engines": 5,
+        "helicopters": 1,
+        "structures_lost": 0,
+        "cost_to_date_usd": null,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "East Air",
+        "unit": "MS-MNF",
+        "acres": 305,
+        "acres_change": null,
+        "pct": 100,
+        "ctn_or_comp": "Ctn",
+        "est_date": null,
+        "personnel": 9,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 2,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 40000,
+        "origin_owner": "FS",
+        "is_new": true
+      },
+      {
+        "name": "Range 47",
+        "unit": "MS-MNF",
+        "acres": 2379,
+        "acres_change": 0,
+        "pct": 100,
+        "ctn_or_comp": "Ctn",
+        "est_date": null,
+        "personnel": 18,
+        "personnel_change": 0,
+        "crews": 0,
+        "engines": 4,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 90000,
+        "origin_owner": "FS",
+        "is_new": false
+      },
+      {
+        "name": "201W",
+        "unit": "MS-MNF",
+        "acres": 2700,
+        "acres_change": 0,
+        "pct": 100,
+        "ctn_or_comp": "Ctn",
+        "est_date": null,
+        "personnel": 17,
+        "personnel_change": 0,
+        "crews": 0,
+        "engines": 4,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 75000,
+        "origin_owner": "FS",
+        "is_new": false
+      }
+    ],
+    "EACC": [
+      {
+        "name": "Kessel",
+        "unit": "WV-WVS",
+        "acres": 360,
+        "acres_change": null,
+        "pct": 80,
+        "ctn_or_comp": "Ctn",
+        "est_date": "UNK",
+        "personnel": 0,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 0,
+        "helicopters": 0,
+        "structures_lost": 0,
+        "cost_to_date_usd": 7000,
+        "origin_owner": "ST",
+        "is_new": false
+      },
+      {
+        "name": "Wild River",
+        "unit": "NH-WMF",
+        "acres": 817,
+        "acres_change": null,
+        "pct": 59,
+        "ctn_or_comp": "Ctn",
+        "est_date": "12/1",
+        "personnel": 56,
+        "personnel_change": null,
+        "crews": 0,
+        "engines": 0,
+        "helicopters": 1,
+        "structures_lost": 0,
+        "cost_to_date_usd": 1600000,
+        "origin_owner": "FS",
+        "is_new": false
+      }
+    ]
+  },
+  "yesterday_by_protection": {
+    "by_area": [
+      {
+        "area": "Alaska",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Northwest",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 1,
+          "TOTAL": 1
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Northern California",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 3,
+          "USFS": 0,
+          "TOTAL": 3
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Southern California",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 1,
+          "USFS": 1,
+          "TOTAL": 2
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Northern Rockies",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Great Basin",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Southwest",
+        "fires": {
+          "BIA": 0,
+          "BLM": 1,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 1
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Rocky Mountain",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 0,
+          "USFS": 0,
+          "TOTAL": 0
+        }
+      },
+      {
+        "area": "Eastern Area",
+        "fires": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 5,
+          "USFS": 2,
+          "TOTAL": 7
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 1,
+          "USFS": 64,
+          "TOTAL": 65
+        }
+      },
+      {
+        "area": "Southern Area",
+        "fires": {
+          "BIA": 1,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 28,
+          "USFS": 3,
+          "TOTAL": 32
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 0,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 113,
+          "USFS": 291,
+          "TOTAL": 404
+        }
+      }
+    ],
+    "totals": {
+      "fires": {
+        "BIA": 1,
+        "BLM": 1,
+        "FWS": 0,
+        "NPS": 0,
+        "ST_OT": 37,
+        "USFS": 7,
+        "TOTAL": 46
+      },
+      "acres": {
+        "BIA": 0,
+        "BLM": 0,
+        "FWS": 0,
+        "NPS": 0,
+        "ST_OT": 114,
+        "USFS": 355,
+        "TOTAL": 469
+      }
+    }
+  },
+  "ytd_by_protection": {
+    "by_area": [
+      {
+        "area": "Alaska",
+        "fires": {
+          "BIA": 0,
+          "BLM": 149,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 231,
+          "USFS": 41,
+          "TOTAL": 421
+        },
+        "acres": {
+          "BIA": 0,
+          "BLM": 36761,
+          "FWS": 0,
+          "NPS": 0,
+          "ST_OT": 52184,
+          "USFS": 12,
+          "TOTAL": 88957
+        }
+      },
+      {
+        "area": "Northwest",
+        "fires": {
+          "BIA": 284,
+          "BLM": 315,
+          "FWS": 28,
+          "NPS": 53,
+          "ST_OT": 1952,
+          "USFS": 896,
+          "TOTAL": 3528
+        },
+        "acres": {
+          "BIA": 310556,
+          "BLM": 1978263,
+          "FWS": 34146,
+          "NPS": 19039,
+          "ST_OT": 566315,
+          "USFS": 519584,
+          "TOTAL": 3427901
+        }
+      },
+      {
+        "area": "Northern California",
+        "fires": {
+          "BIA": 62,
+          "BLM": 18,
+          "FWS": 2,
+          "NPS": 34,
+          "ST_OT": 2537,
+          "USFS": 435,
+          "TOTAL": 3088
+        },
+        "acres": {
+          "BIA": 7736,
+          "BLM": 70418,
+          "FWS": 5,
+          "NPS": 53,
+          "ST_OT": 20227,
+          "USFS": 8379,
+          "TOTAL": 106818
+        }
+      },
+      {
+        "area": "Southern California",
+        "fires": {
+          "BIA": 10,
+          "BLM": 79,
+          "FWS": 5,
+          "NPS": 46,
+          "ST_OT": 3596,
+          "USFS": 394,
+          "TOTAL": 4130
+        },
+        "acres": {
+          "BIA": 2,
+          "BLM": 9646,
+          "FWS": 4,
+          "NPS": 25604,
+          "ST_OT": 147156,
+          "USFS": 54360,
+          "TOTAL": 236772
+        }
+      },
+      {
+        "area": "Northern Rockies",
+        "fires": {
+          "BIA": 309,
+          "BLM": 113,
+          "FWS": 7,
+          "NPS": 4,
+          "ST_OT": 1537,
+          "USFS": 596,
+          "TOTAL": 2566
+        },
+        "acres": {
+          "BIA": 20833,
+          "BLM": 9462,
+          "FWS": 520,
+          "NPS": 6,
+          "ST_OT": 66395,
+          "USFS": 115470,
+          "TOTAL": 212685
+        }
+      },
+      {
+        "area": "Great Basin",
+        "fires": {
+          "BIA": 46,
+          "BLM": 1180,
+          "FWS": 3,
+          "NPS": 44,
+          "ST_OT": 1063,
+          "USFS": 541,
+          "TOTAL": 2877
+        },
+        "acres": {
+          "BIA": 3172,
+          "BLM": 1259939,
+          "FWS": 2,
+          "NPS": 784,
+          "ST_OT": 275093,
+          "USFS": 393406,
+          "TOTAL": 1932397
+        }
+      },
+      {
+        "area": "Southwest",
+        "fires": {
+          "BIA": 694,
+          "BLM": 216,
+          "FWS": 5,
+          "NPS": 30,
+          "ST_OT": 819,
+          "USFS": 1040,
+          "TOTAL": 2804
+        },
+        "acres": {
+          "BIA": 3644,
+          "BLM": 6414,
+          "FWS": 7131,
+          "NPS": 806,
+          "ST_OT": 81032,
+          "USFS": 113647,
+          "TOTAL": 212674
+        }
+      },
+      {
+        "area": "Rocky Mountain",
+        "fires": {
+          "BIA": 192,
+          "BLM": 508,
+          "FWS": 17,
+          "NPS": 35,
+          "ST_OT": 2108,
+          "USFS": 457,
+          "TOTAL": 3317
+        },
+        "acres": {
+          "BIA": 1682,
+          "BLM": 35902,
+          "FWS": 3964,
+          "NPS": 1412,
+          "ST_OT": 1330769,
+          "USFS": 211515,
+          "TOTAL": 1585244
+        }
+      },
+      {
+        "area": "Eastern Area",
+        "fires": {
+          "BIA": 223,
+          "BLM": 0,
+          "FWS": 27,
+          "NPS": 17,
+          "ST_OT": 9081,
+          "USFS": 405,
+          "TOTAL": 9753
+        },
+        "acres": {
+          "BIA": 1086,
+          "BLM": 0,
+          "FWS": 344,
+          "NPS": 17,
+          "ST_OT": 86453,
+          "USFS": 87176,
+          "TOTAL": 175076
+        }
+      },
+      {
+        "area": "Southern Area",
+        "fires": {
+          "BIA": 1186,
+          "BLM": 2,
+          "FWS": 111,
+          "NPS": 135,
+          "ST_OT": 35362,
+          "USFS": 847,
+          "TOTAL": 37643
+        },
+        "acres": {
+          "BIA": 87954,
+          "BLM": 72,
+          "FWS": 52776,
+          "NPS": 44942,
+          "ST_OT": 1260860,
+          "USFS": 73420,
+          "TOTAL": 1520024
+        }
+      }
+    ],
+    "totals": {
+      "fires": {
+        "BIA": 3006,
+        "BLM": 2580,
+        "FWS": 205,
+        "NPS": 398,
+        "ST_OT": 58286,
+        "USFS": 5652,
+        "TOTAL": 70127
+      },
+      "acres": {
+        "BIA": 436664,
+        "BLM": 3406877,
+        "FWS": 98892,
+        "NPS": 92663,
+        "ST_OT": 3886485,
+        "USFS": 1576968,
+        "TOTAL": 9498549
+      }
+    },
+    "ten_year_average": {
+      "fires": 54083,
+      "acres": 6521188
+    }
+  },
+  "predictive_services_discussion": "National Predictive Services Outlook (7-Day Significant Fire Potential Outlook) National Weather Service, Storm Prediction Center: Fire Weather Outlook Map and discussion National Weather Service: Fire Weather Hazards Map National Weather Service, Weather Prediction Center: National Forecast Chart and Short Range Forecast Discussion 6 Minutes for Safety topics can be found here.",
+  "parse_warnings": [],
+  "generated_utc": "2026-11-21T12:50:13Z",
+  "source_url": "https://www.nifc.gov/nicc-files/sitreprt.pdf",
+  "pdf_bytes": 181878,
+  "fetch": {
+    "fetched_utc": "2026-11-21T12:50:12Z",
+    "duration_seconds": 0.35
+  }
+}
