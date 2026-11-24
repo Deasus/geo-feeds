@@ -1,0 +1,78 @@
+{
+  "generated_utc": "2026-11-24T16:30:41.647329Z",
+  "total_features": 29908,
+  "sources": [
+    {
+      "source": "epa_frs",
+      "generated": "2026-11-24T16:29:12.367131Z",
+      "count": 9807,
+      "naics_used": [
+        "324110",
+        "221112",
+        "331110",
+        "327310",
+        "562213"
+      ]
+    },
+    {
+      "source": "gvp_holocene",
+      "generated": "2026-11-24T16:29:12.861925Z",
+      "count": 1209
+    },
+    {
+      "source": "gibs_nuclear",
+      "generated": "2026-11-24T16:29:13.374832Z",
+      "count": 235
+    },
+    {
+      "source": "firms_self_mined_persistent",
+      "generated": "2026-11-24T16:29:13.457095Z",
+      "count": 1814,
+      "lookback_days": 90,
+      "sampled_commits": 37,
+      "algorithm": "0.0040\u00b0 grid quantization + \u22656 distinct-day threshold"
+    },
+    {
+      "source": "global_industrial",
+      "generated": "2026-11-24T16:29:16.847461Z",
+      "count": 14099,
+      "detail": {
+        "wri_gppd": {
+          "status": "fresh",
+          "count": 7480,
+          "generated_utc": "2026-11-24T16:29:16.847461Z"
+        },
+        "osm": {
+          "status": "fresh",
+          "count": 6619,
+          "generated_utc": "2026-11-24T16:29:16.847461Z"
+        }
+      }
+    },
+    {
+      "source": "nasa_static",
+      "generated": "2026-11-24T16:30:36.938919Z",
+      "year": 2025,
+      "countries": [
+        "United_States"
+      ],
+      "count": 2744,
+      "method": "FIRMS Static Thermal Anomalies method on NASA type-2 detections: 400 m grid, >= 5 detections in the year",
+      "attribution": "We acknowledge the use of data from NASA's Fire Information for Resource Management System (FIRMS) (https://earthdata.nasa.gov/firms), part of NASA's Earth Science Data and Information System (ESDIS).",
+      "licence": "NASA Earth Science Data and Information Policy: open, free of charge, no restriction on use"
+    },
+    {
+      "source": "natural_earth_land_10m",
+      "file": "data/land_10m.geojson",
+      "available": true
+    }
+  ],
+  "consumer": "firms feed/fetch_firms.py",
+  "buffer_defaults": {
+    "industrial": 500,
+    "volcano": 5000,
+    "nuclear": 500,
+    "persistent_other": 550,
+    "industrial_firms": 550
+  }
+}
