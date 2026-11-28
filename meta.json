@@ -1,0 +1,96 @@
+{
+  "updated": "2026-11-28T18:52:38Z",
+  "schema_version": 2,
+  "fields": {
+    "wind": {
+      "vars": [
+        "u10",
+        "v10"
+      ],
+      "level": "10 m above ground",
+      "units": "m/s",
+      "components": "earth-relative (east, north): rotated from HRRR's grid-relative u/v since 2026-11-16"
+    },
+    "thermo": {
+      "vars": [
+        "t2m",
+        "r2"
+      ],
+      "level": "2 m above ground",
+      "units": [
+        "K",
+        "%"
+      ]
+    }
+  },
+  "regions": {
+    "conus": {
+      "region": "conus",
+      "wind": {
+        "ok": true,
+        "kind": "wind",
+        "run": "2026112816z",
+        "shape": [
+          280,
+          630
+        ],
+        "size_mb": 6.14,
+        "components": {
+          "gridType": "lambert",
+          "uvRelativeToGrid": true,
+          "rotated": true,
+          "LoV": 262.5,
+          "n": 0.622515,
+          "Latin1": 38.5,
+          "Latin2": 38.5,
+          "max_abs_angle_deg": 22.78
+        }
+      },
+      "thermo": {
+        "ok": true,
+        "kind": "thermo",
+        "run": "2026112816z",
+        "shape": [
+          280,
+          630
+        ],
+        "size_mb": 5.8
+      }
+    },
+    "alaska": {
+      "region": "alaska",
+      "wind": {
+        "ok": true,
+        "kind": "wind",
+        "run": "2026112815z",
+        "shape": [
+          246,
+          586
+        ],
+        "size_mb": 5.24,
+        "components": {
+          "gridType": "polar_stereographic",
+          "uvRelativeToGrid": true,
+          "rotated": true,
+          "LoV": 225.0,
+          "n": 1.0,
+          "Latin1": null,
+          "Latin2": null,
+          "max_abs_angle_deg": 68.56
+        }
+      },
+      "thermo": {
+        "ok": true,
+        "kind": "thermo",
+        "run": "2026112815z",
+        "shape": [
+          246,
+          586
+        ],
+        "size_mb": 4.27
+      }
+    }
+  },
+  "source": "NOAA NOMADS HRRR (cfgrib + earth-relative rotation + scipy griddata resample)",
+  "pipeline": "https://github.com/Deasus/geo-feeds"
+}
